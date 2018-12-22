@@ -49,7 +49,6 @@ Using binutils to generate the assembly file
 
 ```
 riscv64-unknown-elf-objdump -d dhrystone.riscv > dhrystone.s
-
 ```
 
 Generate the VCG file
