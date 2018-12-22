@@ -55,7 +55,7 @@ riscv64-unknown-elf-objdump -d dhrystone.riscv > dhrystone.s
 Generate the VCG file
 
 ```
-graphgen --tree dhrystone.s dhrystone.vcg
+graphgen --target riscv --tree dhrystone.s dhrystone.vcg
 ```
 
 Recomment use <A Href="https://pp.ipd.kit.edu/firm/yComp.html">yComp</A> to browse the VCG file.<br>
