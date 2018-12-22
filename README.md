@@ -12,7 +12,11 @@ PCRE: Perl Compatible Regular Expressions
 
 # features
 
-<img src="https://github.com/kuopinghsu/callgraph/blob/master/images/dhrystone.svg" alt="Dhrystone Call Tree" width=640>
+An example of call graph:
+<img src="https://github.com/kuopinghsu/callgraph/blob/master/images/dhrystone-callgraph.svg" alt="Dhrystone Call Graph" width=640>
+
+An example of call tree:
+<img src="https://github.com/kuopinghsu/callgraph/blob/master/images/dhrystone-calltree.svg" alt="Dhrystone Call Tree" width=640>
 
 # usage
 
