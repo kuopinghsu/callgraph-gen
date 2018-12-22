@@ -62,12 +62,12 @@ Example:
 This is an example to show the call tree of RISC-V's dhrystone diag. Using binutils to generate the assembly file
 
 ```
-riscv64-unknown-elf-objdump -d dhrystone.riscv > dhrystone.s
+$ riscv64-unknown-elf-objdump -d dhrystone.riscv > dhrystone.s
 ```
 Generate the Call-Graph of VCG file
 
 ```
-graphgen --target riscv --graph dhrystone.s dhrystone.vcg
+$ graphgen --target riscv --graph dhrystone.s dhrystone.vcg
 ```
 
 This is an example of call graph of RISC-V's dhrystone.<br>
@@ -76,7 +76,7 @@ This is an example of call graph of RISC-V's dhrystone.<br>
 Generate the Call-Tree of VCG file
 
 ```
-graphgen --target riscv --tree dhrystone.s dhrystone.vcg
+$ graphgen --target riscv --tree dhrystone.s dhrystone.vcg
 ```
 
 This is an example of a call tree of RISC-V's dhrystone, and the red arc represents the call path used by the largest stack<br>
@@ -88,5 +88,5 @@ Recomment use <A Href="https://pp.ipd.kit.edu/firm/yComp.html">yComp</A> to brow
 
 <img src="https://github.com/kuopinghsu/callgraph/blob/master/images/yComp.png" alt="yComp">
 
-# license
+# License
 MIT license
