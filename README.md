@@ -30,14 +30,6 @@ $ make
 - Recursive detection
 - Calculate the stack usage
 
-This is an example of call graph.<br>
-<img src="https://github.com/kuopinghsu/callgraph/blob/master/images/dhrystone-callgraph.svg" alt="Dhrystone Call Graph" width=640>
-
-This is an example of a call tree, and the red arc represents the call path used by the largest stack<br>
-<img src="https://github.com/kuopinghsu/callgraph/blob/master/images/dhrystone-calltree.svg" alt="Dhrystone Call Tree" width=640>
-
-(Note: This is a static analysis and is inaccurate if an indirect function call or recursion is detected.)
-
 # Usage
 ```
 Generate call graph of a elf binary file.
@@ -78,6 +70,14 @@ Generate the VCG file
 ```
 graphgen --target riscv --tree dhrystone.s dhrystone.vcg
 ```
+
+This is an example of call graph of RISC-V's dhrystone.<br>
+<img src="https://github.com/kuopinghsu/callgraph/blob/master/images/dhrystone-callgraph.svg" alt="Dhrystone Call Graph" width=640>
+
+This is an example of a call tree of RISC-V's dhrystone, and the red arc represents the call path used by the largest stack<br>
+<img src="https://github.com/kuopinghsu/callgraph/blob/master/images/dhrystone-calltree.svg" alt="Dhrystone Call Tree" width=640>
+
+(Note: This is a static analysis and is inaccurate if an indirect function call or recursion is detected.)
 
 Recomment use <A Href="https://pp.ipd.kit.edu/firm/yComp.html">yComp</A> to browse the VCG file.<br>
 
