@@ -12,10 +12,10 @@ PCRE: Perl Compatible Regular Expressions
 
 # features
 
-An example of call graph:
+An example of call graph:<br>
 <img src="https://github.com/kuopinghsu/callgraph/blob/master/images/dhrystone-callgraph.svg" alt="Dhrystone Call Graph" width=640>
 
-An example of call tree:
+An example of call tree:<br>
 <img src="https://github.com/kuopinghsu/callgraph/blob/master/images/dhrystone-calltree.svg" alt="Dhrystone Call Tree" width=640>
 
 # usage
