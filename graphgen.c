@@ -36,7 +36,7 @@ ARCH arch[] = {
     { .name = "riscv",
       .pat = { 
         // function name declaration
-        "^([0-9A-Fa-f]+)\\s+<(.+)>:",
+        "^([0-9A-Fa-f]+)\\s+<([^\\+^\\-]+)>:",
         // stack allocation
         "^\\s*([0-9A-Fa-f]+):.+addi\\s+sp,sp,\\-(\\d+)",
         // function call
@@ -48,7 +48,7 @@ ARCH arch[] = {
     { .name = "arm",
       .pat = { 
         // function name delcaration
-        "^([0-9A-Fa-f]+)\\s+<(.+)>:",
+        "^([0-9A-Fa-f]+)\\s+<([^\\+^\\-]+)>:",
         // stack allocation
         "^\\s*([0-9A-Fa-f]+):.+sub\\s+sp,\\s*sp,\\s*#(\\d+)",
         // function call
@@ -60,7 +60,7 @@ ARCH arch[] = {
     { .name = "openrisc",
       .pat = { 
         // function name delcaration
-        "^([0-9A-Fa-f]+)\\s+<(.+)>:",
+        "^([0-9A-Fa-f]+)\\s+<([^\\+^\\-]+)>:",
         // stack allocation
         "^\\s*([0-9A-Fa-f]+):.+addi\\s+r1,\\s*r1,\\s*([0-9A-Fa-fxX]+)",
         // function call
@@ -566,6 +566,12 @@ int create_graph(char *filename) {
             getop(buf, line, ovector, 1);
             sscanf(buf, "%x", &PC);
         }
+    }
+
+    if (!node) {
+        fprintf(stderr, "!!Error!! can not create call graph\n");
+        fclose(fp);
+        exit(-1);
     }
 
     if (!node->stack_size) node->stack_size = stack;
