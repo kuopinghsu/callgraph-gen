@@ -34,7 +34,7 @@ typedef struct _ARCH {
 
 ARCH arch[] = {
     { .name = "riscv",
-      .pat = { 
+      .pat = {
         // function name declaration
         "^([0-9A-Fa-f]+)\\s+<([^\\+^\\-]+)>:",
         // stack allocation
@@ -46,7 +46,7 @@ ARCH arch[] = {
       }
     },
     { .name = "arm",
-      .pat = { 
+      .pat = {
         // function name delcaration
         "^([0-9A-Fa-f]+)\\s+<([^\\+^\\-]+)>:",
         // stack allocation
@@ -58,7 +58,7 @@ ARCH arch[] = {
       }
     },
     { .name = "openrisc",
-      .pat = { 
+      .pat = {
         // function name delcaration
         "^([0-9A-Fa-f]+)\\s+<([^\\+^\\-]+)>:",
         // stack allocation
@@ -138,34 +138,35 @@ void usage(void) {
 
     printf(
 "Generate call graph of a elf binary file.\n\n"
-"Usage: graphgen [-v] [-a target] [-m n] [-g | -t] [-c | -d] [-r name]\n"
-"        [-i list] [-h] asm_file vcg_file\n\n"
-"        --verbose, -v           verbose output\n"
-"        --target name, -a name  specify the target arch\n"
-"        --max n, -m n           max depth (default 256)\n"
-"        --graph, -g             generate call graph (default)\n"
-"        --tree, -t              generate call tree\n"
-"        --vcg                   generate vcg graph (default)\n"
-"        --dot                   generate dot graph\n"
-"        --ignore list, -i list  ignore list\n"
-"        --help, -h              help\n"
+"Usage:\n"
+"    graphgen [-v] [-a target] [-m n] [-g | -t] [-c | -d] [-r name]\n"
+"             [-i list] [-h] asm_file vcg_file\n\n"
+"    --verbose, -v           verbose output\n"
+"    --target name, -a name  specify the target (see support target below)\n"
+"    --max n, -m n           max depth (default 256)\n"
+"    --graph, -g             generate call graph (default)\n"
+"    --tree, -t              generate call tree\n"
+"    --vcg                   generate vcg graph (default)\n"
+"    --dot                   generate dot graph\n"
+"    --ignore list, -i list  ignore list\n"
+"    --help, -h              help\n"
 "\n");
 
-    printf("Support target arch:\n");
+    printf("Support target:\n");
     for(i=0; i<sizeof(arch)/sizeof(ARCH); i++) {
         if (i == 0) {
-            printf("\t%s (default)\n", arch[i].name);
+            printf("    %s (default)\n", arch[i].name);
         } else {
-            printf("\t%s\n", arch[i].name);
+            printf("    %s\n", arch[i].name);
         }
     }
 
     printf(
 "\nExample:\n\n"
-"    graphgen --max 10 --tree --ignore abort,exit infile.s outfile.vcg\n"
+"    $ graphgen --max 10 --tree --ignore abort,exit infile.s outfile.vcg\n"
 "\n"
-"        maximun tree depth is 10, generate a call tree\n"
-"        ignode function abort, and exit\n"
+"    maximun tree depth is 10, generate a call tree, ignode function abort, and\n"
+"    exit\n"
 );
 
 }
