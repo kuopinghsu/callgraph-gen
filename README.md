@@ -12,6 +12,8 @@ PCRE: Perl Compatible Regular Expressions
 
 # features
 
+<img src="https://github.com/kuopinghsu/callgraph/images/dhrystone.svg" alt="Dhrystone Call Tree" width=640>
+
 # usage
 
 # license
