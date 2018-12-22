@@ -64,15 +64,20 @@ This is an example to show the call tree of RISC-V's dhrystone diag. Using binut
 ```
 riscv64-unknown-elf-objdump -d dhrystone.riscv > dhrystone.s
 ```
-
-Generate the VCG file
+Generate the Call-Graph of VCG file
 
 ```
-graphgen --target riscv --tree dhrystone.s dhrystone.vcg
+graphgen --target riscv --graph dhrystone.s dhrystone.vcg
 ```
 
 This is an example of call graph of RISC-V's dhrystone.<br>
 <img src="https://github.com/kuopinghsu/callgraph/blob/master/images/dhrystone-callgraph.svg" alt="Dhrystone Call Graph" width=640>
+
+Generate the Call-Tree of VCG file
+
+```
+graphgen --target riscv --tree dhrystone.s dhrystone.vcg
+```
 
 This is an example of a call tree of RISC-V's dhrystone, and the red arc represents the call path used by the largest stack<br>
 <img src="https://github.com/kuopinghsu/callgraph/blob/master/images/dhrystone-calltree.svg" alt="Dhrystone Call Tree" width=640>
