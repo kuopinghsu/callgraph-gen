@@ -19,7 +19,7 @@ An example of call tree:<br>
 <img src="https://github.com/kuopinghsu/callgraph/blob/master/images/dhrystone-calltree.svg" alt="Dhrystone Call Tree" width=640>
 
 # usage
-
+```
 Usage: graphgen [-v] [-a target] [-m n] [-g | -t] [-c | -d] [-r name]
         [-i list] [-h] asm_file vcg_file
 
@@ -39,10 +39,28 @@ Support target arch:
         openrisc
 
 Example:
-    graphgen --max 10 --tree --ignore _exit,abort infile.s outfile.vcg
+    graphgen --max 10 --tree --ignore abort,exit infile.s outfile.vcg
 
         maximun tree depth is 10, generate a call tree
-        ignode function _exit and abort
+        ignode function abort and exit
+```
+
+Using binutils to generate the assembly file
+
+```
+riscv64-unknown-elf-objdump -d dhrystone.riscv &gt; dhrystone.s
+
+```
+
+Generate the VCG file
+
+```
+graphgen --tree dhrystone.s dhrystone.vcg
+```
+
+Recomment use <A Href="https://pp.ipd.kit.edu/firm/yComp.html">yComp</A> to browse the VCG file.<br>
+
+<img src="https://github.com/kuopinghsu/callgraph/blob/master/images/yComp.png" alt="yComp">
 
 # license
 MIT license

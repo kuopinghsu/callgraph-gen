@@ -137,11 +137,11 @@ void usage(void) {
     int i;
 
     printf(
-"Generate call graph of a elf binary file. Kuoping Hsu\n\n"
+"Generate call graph of a elf binary file.\n\n"
 "Usage: graphgen [-v] [-a target] [-m n] [-g | -t] [-c | -d] [-r name]\n"
 "        [-i list] [-h] asm_file vcg_file\n\n"
 "        --verbose, -v           verbose output\n"
-"        --target, -a            specify the target arch\n"
+"        --target name, -a name  specify the target arch\n"
 "        --max n, -m n           max depth (default 256)\n"
 "        --graph, -g             generate call graph (default)\n"
 "        --tree, -t              generate call tree\n"
@@ -162,10 +162,10 @@ void usage(void) {
 
     printf(
 "\nExample:\n\n"
-"    graphgen --max 10 --tree --ignore _Atexit,abort,exit infile.s outfile.vcg\n"
+"    graphgen --max 10 --tree --ignore abort,exit infile.s outfile.vcg\n"
 "\n"
 "        maximun tree depth is 10, generate a call tree\n"
-"        ignode function _Atexit, abort, and exit\n"
+"        ignode function abort, and exit\n"
 );
 
 }
