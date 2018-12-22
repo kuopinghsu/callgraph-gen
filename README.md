@@ -4,11 +4,9 @@ Generating the call graph from elf binary file
 # Getting Started
 It requires following library to build the code.
 
-uthash: hash library
-https://troydhanson.github.io/uthash/userguide.html
+- uthash: hash library https://troydhanson.github.io/uthash/userguide.html
 
-PCRE: Perl Compatible Regular Expressions
-https://www.pcre.org/
+- PCRE: Perl Compatible Regular Expressions https://www.pcre.org/
 
 Install the PCRE library to /usr/local directory.
 
