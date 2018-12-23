@@ -33,7 +33,7 @@ ARCH arch[] = {
         // function call
         "^\\s*([0-9A-Fa-f]+):.+bl\\s+[0-9A-Fa-f]+\\s+<(.+)>",
         // indirect function calll
-        "^\\s*([0-9A-Fa-f]+):.+jalr\\s+\\S+"
+        "^\\s*([0-9A-Fa-f]+):.+blx\\s+\\S+"
       }
     },
     { .name = "openrisc",
