@@ -1,4 +1,4 @@
-# callgraph
+# Callgraph Generator
 Generating the call graph from elf binary file
 
 # Getting Started
