@@ -7,7 +7,7 @@ EXEFILE = graphgen
 all: $(EXEFILE)
 
 .SUFFIXES: .c .h .o
-%.o: %.c Makefile
+%.o: %.c %.h Makefile
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 $(EXEFILE): $(OBJECTS)
