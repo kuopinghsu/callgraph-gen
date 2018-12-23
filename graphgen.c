@@ -26,6 +26,7 @@ int vcg = 1;
 int frame_pointer = 0;
 int recursived = 0;
 int indirect = 0;
+int stack_info = 0;
 
 // specify the ignore list
 char ignore_list[4096] = "";
@@ -249,7 +250,7 @@ int create_graph(char *filename) {
     stack = 0;
 
     while(!feof(fp) && fgets(line, sizeof(line), fp)) {
-        PCRE2_SIZE* ovector;
+        PCRE2_SIZE* ovector = NULL;
 
         // Cross the section
         ovector = regex(re, match_data, (PCRE2_SPTR8)line, (PCRE2_SPTR8)
@@ -317,25 +318,30 @@ int create_graph(char *filename) {
         }
 
         // get stack size
-        ovector = regex(re, match_data, (PCRE2_SPTR8)line, (PCRE2_SPTR8)
+        if (ITEM_STACK[0] != 0) {
+            ovector = regex(re, match_data, (PCRE2_SPTR8)line, (PCRE2_SPTR8)
                   ITEM_STACK);
-        if (ovector != NULL) {
-            getop(buf, line, ovector, 1);
-            if (VERBOSE) printf("%s: ", buf);
-            sscanf(buf, "%x", &PC);
 
-            getop(buf, line, ovector, 2);
-            if (buf[0] == '0' && (buf[1] == 'x' || buf[1] == 'X')) {
-                sscanf(buf, "%x", &stack);
-            } else {
-                sscanf(buf, "%d", &stack);
+            if (ovector != NULL) {
+                getop(buf, line, ovector, 1);
+                if (VERBOSE) printf("%s: ", buf);
+                sscanf(buf, "%x", &PC);
+
+                getop(buf, line, ovector, 2);
+                if (buf[0] == '0' && (buf[1] == 'x' || buf[1] == 'X')) {
+                    sscanf(buf, "%x", &stack);
+                } else {
+                    sscanf(buf, "%d", &stack);
+                }
+                if (VERBOSE) printf("stack size %d\n", stack);
+
+                // update stack size
+                node->stack_size = stack;
+
+                stack_info = 1;
+
+                continue;
             }
-            if (VERBOSE) printf("stack size %d\n", stack);
-
-            // update stack size
-            node->stack_size = stack;
-
-            continue;
         }
 
         // funcation call
@@ -721,7 +727,10 @@ void create_tree(char *name) {
             traverse(s);
             mark_tree(mark_node);
             printf("== stack summary ==\n");
-            printf("function %s: %d bytes stack usage\n", s->name, max_frame);
+            if (max_frame != 0)
+                printf("root function %s: %d bytes stack usage\n", s->name, max_frame);
+            else
+                printf("root function %s\n", s->name);
         } else {
             fprintf(stderr, "can not find the function %s\n", name);
             exit(-1);
@@ -735,7 +744,10 @@ void create_tree(char *name) {
         printf("== stack summary ==\n");
 
         HASH_ITER(hh, root, r, t2) {
-            printf("function %s: %d bytes stack usage\n", r->node->name, r->frame_size);
+            if (r->frame_size)
+                printf("function %s: %d bytes stack usage\n", r->node->name, r->frame_size);
+            else
+                printf("function %s\n", r->node->name);
         }
     }
 
@@ -769,6 +781,7 @@ void gen_graph_vcg(char *filename, int only_linked) {
 
     HASH_ITER(hh, graph, s, tmp) {
         char *color;
+        char stack[MAXSIZE] = "";
         char frame[MAXSIZE] = "";
 
         if (VERBOSE) printf("%s: callee addr 0x%08x, prog size: %d, stack size: %d\n", s->name, s->pc, s->prog_size, s->stack_size);
@@ -776,15 +789,18 @@ void gen_graph_vcg(char *filename, int only_linked) {
         if (only_linked && !s->traversed)
             continue;
 
-        if (tree)
-            snprintf(frame, sizeof(frame), "FRAME: %d", s->frame_size);
+        if (stack_info)
+            snprintf(stack, sizeof(stack), "\\nSTACK: %d", s->stack_size);
+
+        if (tree && stack_info)
+            snprintf(frame, sizeof(frame), "\\nFRAME: %d", s->frame_size);
 
         if (s->unknown || (s->prog_size == 0))
             color = "aquamarine";
         else if (s->mark)
             color = "white";
         else if (s->recursived)
-            color = "white";
+            color = "aquamarine";
         else
             color = "white";
 
@@ -792,13 +808,13 @@ void gen_graph_vcg(char *filename, int only_linked) {
         fprintf(fp, \
             "  node: {\n" \
             "    title: \"%s\"\n" \
-            "    label: \"%s\\nPROG: %d\\nSTACK: %d\\n%s\"\n" \
+            "    label: \"%s\\nPROG: %d%s%s\"\n" \
             "    color: %s\n" \
             "  }\n\n",
             s->key,
             s->name,
             s->prog_size,
-            s->stack_size,
+            stack,
             frame,
             color
         );
@@ -806,7 +822,7 @@ void gen_graph_vcg(char *filename, int only_linked) {
         // Add VCG edge
         list = s->list;
         for(i=0; list != NULL; i++) {
-            if (list->child->mark)
+            if (list->child->mark && stack_info)
                 fprintf(fp, "  edge: { sourcename: \"%s\" targetname: \"%s\" color: red }\n",
                     s->key, list->child->key);
             else
@@ -842,6 +858,7 @@ void gen_graph_dot(char *filename, int only_linked) {
 
     HASH_ITER(hh, graph, s, tmp) {
         char *color;
+        char stack[MAXSIZE] = "";
         char frame[MAXSIZE] = "";
 
         if (VERBOSE) printf("%s: callee addr 0x%08x, prog size: %d, stack size: %d\n", s->name, s->pc, s->prog_size, s->stack_size);
@@ -849,25 +866,28 @@ void gen_graph_dot(char *filename, int only_linked) {
         if (only_linked && !s->traversed)
             continue;
 
-        if (tree)
+        if (stack_info)
+            snprintf(stack, sizeof(stack), "|STACK: %d", s->stack_size);
+
+        if (tree && stack_info)
             snprintf(frame, sizeof(frame), "|FRAME: %d", s->frame_size);
 
         if (s->unknown || (s->prog_size == 0))
-            color = "lightgreen";
+            color = "aquamarine";
         else if (s->mark)
-            color = "darkcyan";
+            color = "white";
         else if (s->recursived)
-            color = "lightcyan";
+            color = "aquamarine";
         else
             color = "white";
 
         // Add dot Node
         fprintf(fp,
-            "  %s_%d [ label = \"%s|PROG: %d|STACK: %d%s\" color = %s];\n",
+            "  %s_%d [ label = \"%s|PROG: %d%s%s\" color = %s];\n",
             s->name, s->id,
             s->name,
             s->prog_size,
-            s->stack_size,
+            stack,
             frame,
             color
         );

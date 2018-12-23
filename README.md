@@ -88,5 +88,10 @@ Recomment use <A Href="https://pp.ipd.kit.edu/firm/yComp.html">yComp</A> to brow
 
 <img src="https://github.com/kuopinghsu/callgraph/blob/master/images/yComp.png" alt="yComp">
 
+# Limitations
+
+- Can not generate the call stack for AMR
+
 # License
 MIT license
+

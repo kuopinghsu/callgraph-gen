@@ -29,10 +29,10 @@ ARCH arch[] = {
         // function name delcaration
         "^([0-9A-Fa-f]+)\\s+<([^\\+^\\-]+)>:",
         // stack allocation
-        "^\\s*([0-9A-Fa-f]+):.+sub\\s+sp,\\s*sp,\\s*#(\\d+)",
+        "", // "^\\s*([0-9A-Fa-f]+):.+sub\\s+sp,\\s*sp,\\s*#(\\d+)",
         // function call
         "^\\s*([0-9A-Fa-f]+):.+bl\\s+[0-9A-Fa-f]+\\s+<(.+)>",
-        // indirect function calll
+        // indirect function call
         "^\\s*([0-9A-Fa-f]+):.+blx\\s+\\S+"
       }
     },
@@ -41,10 +41,10 @@ ARCH arch[] = {
         // function name delcaration
         "^([0-9A-Fa-f]+)\\s+<([^\\+^\\-]+)>:",
         // stack allocation
-        "^\\s*([0-9A-Fa-f]+):.+addi\\s+r1,\\s*r1,\\s*([0-9A-Fa-fxX]+)",
+        "^\\s*([0-9A-Fa-f]+):.+l\\.addi\\s+r1,\\s*r1,\\s*\\-([0-9A-Fa-fxX]+)",
         // function call
         "^\\s*([0-9A-Fa-f]+):.+jal\\s+[0-9A-Fa-f]+\\s+<(.+)>",
-        // indirect function calll
+        // indirect function call
         "^\\s*([0-9A-Fa-f]+):.+jalr\\s+\\S+"
       }
     },
