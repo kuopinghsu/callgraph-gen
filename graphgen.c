@@ -16,6 +16,7 @@
 #include "graphgen.h"
 
 #define MAXSIZE 128
+#define MAXREG  64
 #define MAXCHILD 2048
 #define DEFAULT_MAXDEPTH 256
 
@@ -33,6 +34,8 @@ char ignore_list[4096] = "";
 
 // name of root node
 char root_node[MAXSIZE] = "";
+
+char regmap[MAXREG][MAXSIZE];
 
 #define getop(dst, src, ovector, n) snprintf(dst, MAXSIZE, "%.*s", (int)(ovector[2*(n)+1] - ovector[2*(n)]), (src + ovector[2*(n)]))
 
@@ -237,7 +240,7 @@ int create_graph(char *filename) {
     char line[MAXSIZE];
     char buf[MAXSIZE];
     char name[MAXSIZE];
-    int PC, stack;
+    int PC, stack, i;
     NODE *node = NULL;
     NODE *unknown = NULL;
     int skip = 0;
@@ -248,6 +251,10 @@ int create_graph(char *filename) {
     }
 
     stack = 0;
+
+    for(i=0; i<MAXREG; i++) {
+        regmap[i][0] = 0;
+    }
 
     while(!feof(fp) && fgets(line, sizeof(line), fp)) {
         PCRE2_SIZE* ovector = NULL;
@@ -271,11 +278,9 @@ int create_graph(char *filename) {
             char key[MAXSIZE];
 
             getop(buf, line, ovector, 1);
-            if (VERBOSE) printf("%s: ", buf);
             sscanf(buf, "%x", &PC);
 
             getop(name, line, ovector, 2);
-            if (VERBOSE) printf("func %s\n", name);
 
             // Is a ignore node
             {
@@ -314,6 +319,11 @@ int create_graph(char *filename) {
             node->pc = PC;
             stack = 0;
 
+            // release the function map of registers
+            for(i=0; i<MAXREG; i++) {
+                regmap[i][0] = 0;
+            }
+
             continue;
         }
 
@@ -323,23 +333,82 @@ int create_graph(char *filename) {
                   ITEM_STACK);
 
             if (ovector != NULL) {
+                int size;
+
                 getop(buf, line, ovector, 1);
-                if (VERBOSE) printf("%s: ", buf);
                 sscanf(buf, "%x", &PC);
 
                 getop(buf, line, ovector, 2);
                 if (buf[0] == '0' && (buf[1] == 'x' || buf[1] == 'X')) {
-                    sscanf(buf, "%x", &stack);
+                    sscanf(buf, "%x", &size);
                 } else {
-                    sscanf(buf, "%d", &stack);
+                    sscanf(buf, "%d", &size);
                 }
-                if (VERBOSE) printf("stack size %d\n", stack);
+
+                stack += size;
 
                 // update stack size
                 node->stack_size = stack;
 
                 stack_info = 1;
 
+                continue;
+            }
+        }
+
+        // get stack size
+        if (ITEM_PUSH[0] != 0) {
+            ovector = regex(re, match_data, (PCRE2_SPTR8)line, (PCRE2_SPTR8)
+                  ITEM_PUSH);
+
+            if (ovector != NULL) {
+                int size;
+                getop(buf, line, ovector, 1);
+                sscanf(buf, "%x", &PC);
+
+                getop(buf, line, ovector, 2);
+
+                for(size=4, i = 0; buf[i] != 0 && i < MAXSIZE; i++) {
+                    if (buf[i] == ',') size += 4;
+                }
+
+                stack += size;
+
+                // update stack size
+                node->stack_size = stack;
+
+                stack_info = 1;
+
+                continue;
+            }
+        }
+
+        // get loadr
+        if (ITEM_LOADR[0] != 0) {
+            ovector = regex(re, match_data, (PCRE2_SPTR8)line, (PCRE2_SPTR8)
+                  ITEM_LOADR);
+
+            if (ovector != NULL) {
+                int reg;
+                if (skip) continue;
+
+                getop(buf, line, ovector, 1);
+                sscanf(buf, "%x", &PC);
+
+                // register number
+                getop(buf, line, ovector, 2);
+                reg = atoi(buf);
+
+                // function name
+                getop(buf, line, ovector, 3);
+
+                if (reg < MAXREG) {
+                    strncpy(regmap[reg], buf, MAXSIZE);
+
+                    // modify the function name
+                    for(i=0; regmap[reg][i] != 0 && i < MAXSIZE; i++)
+                        if (regmap[reg][i] == '+' || regmap[reg][i] == '-') regmap[reg][i] = '_';
+                }
                 continue;
             }
         }
@@ -357,7 +426,6 @@ int create_graph(char *filename) {
 
             if (skip) continue;
             getop(buf, line, ovector, 1);
-            if (VERBOSE) printf("%s: ", buf);
             sscanf(buf, "%x", &PC);
 
             getop(name, line, ovector, 2);
@@ -365,8 +433,6 @@ int create_graph(char *filename) {
             // modify the function name
             for(i=0; name[i] != 0 && i < MAXSIZE; i++)
                 if (name[i] == '+' || name[i] == '-') name[i] = '_';
-
-            if (VERBOSE) printf("call %s\n", name);
 
             // recursive checking
             if (tree && !strcmp(node->name, name)) {
@@ -446,67 +512,149 @@ int create_graph(char *filename) {
         ovector = regex(re, match_data, (PCRE2_SPTR8)line, (PCRE2_SPTR8)
                   ITEM_CALLR);
         if (ovector != NULL) {
-            int i;
             LIST *ptr;
             LIST *list;
             int found = 0;
+            int reg;
 
             if (skip) continue;
+            getop(buf, line, ovector, 1);
+            sscanf(buf, "%x", &PC);
 
-            indirect = 1;
+            getop(buf, line, ovector, 2);
+            reg = atoi(buf);
 
-            if (unknown == NULL) {
-                // allocat a node
-                unknown = node_dup(NULL);
+            if (regmap[reg][0]) {
+                NODE *s;
+                LIST *ptr;
+                LIST *list;
+                int found = 0;
+                char key[MAXSIZE];
 
-                // function name
-                strncpy(unknown->name, "__unknown__", MAXSIZE);
-                strncpy(unknown->key, "__unknown__:0", MAXSIZE);
-                unknown->unknown = 1;
+                if (VERBOSE) printf("Indirect function call '%s' detected\n", regmap[reg]);
 
-                // add node to hash
-                HASH_ADD_STR(graph, key, unknown);
-            }
-
-            unknown->parent = node;
-
-            list = node->list;
-            if (!list) {
-                if ((list = malloc(sizeof(LIST))) == NULL) {
-                    fprintf(stderr, "malloc fail\n");
-                    exit(-1);
+                // recursive checking
+                if (tree && !strcmp(node->name, regmap[reg])) {
+                    node->recursived = 1;
+                    recursived = 1;
+                    fprintf(stderr, "Warning: recursive function %s dectect\n", regmap[reg]);
+                    continue;
                 }
 
-                node->list = list;
-                list->next = NULL;
-                list->child = unknown;
-            } else {
-                for(i=0; i<MAXCHILD && list->next != NULL; i++) {
-                    if (!strcmp(unknown->name, list->child->name)) {
-                        found = 1;
-                        break;
-                    }
-                    list = list->next;
+                snprintf(key, MAXSIZE, "%s:0", regmap[reg]);
+
+                // Is node exist
+                HASH_FIND_STR(graph, key, s);
+
+                if (!s) {
+                    // allocat a node
+                    s = node_dup(NULL);
+
+                    // function name
+                    strncpy(s->name, regmap[reg], MAXSIZE);
+                    snprintf(s->key, MAXSIZE, "%s:0", regmap[reg]);
+
+                    // add node to hash
+                    HASH_ADD_STR(graph, key, s);
                 }
 
-                if (!strcmp(unknown->name, list->child->name)) {
-                    found = 1;
-                }
+                s->parent = node;
 
-                if (!found) {
-                    if ((ptr = malloc(sizeof(LIST))) == NULL) {
+                list = node->list;
+                if (!list) {
+                    if ((list = malloc(sizeof(LIST))) == NULL) {
                         fprintf(stderr, "malloc fail\n");
                         exit(-1);
                     }
 
-                    list->next = ptr;
-                    ptr->next = NULL;
-                    ptr->child = unknown;
+                    node->list = list;
+                    list->next = NULL;
+                    list->child = s;
+                } else {
+                    for(i=0; i<MAXCHILD && list->next != NULL; i++) {
+                        if (!strcmp(s->name, list->child->name)) {
+                            found = 1;
+                            break;
+                        }
+                        list = list->next;
+                    }
+
+                    if (!strcmp(s->name, list->child->name)) {
+                        found = 1;
+                    }
+
+                    if (!found) {
+                        if ((ptr = malloc(sizeof(LIST))) == NULL) {
+                            fprintf(stderr, "malloc fail\n");
+                            exit(-1);
+                        }
+
+                        list->next = ptr;
+                        ptr->next = NULL;
+                        ptr->child = s;
+                    }
+
+                    if (i == MAXCHILD) {
+                        fprintf(stderr, "Error: out of range for MAXCHILD: %d\n", i);
+                        exit(-1);
+                    }
+                }
+            } else {
+                indirect = 1;
+
+                if (unknown == NULL) {
+                    // allocat a node
+                    unknown = node_dup(NULL);
+
+                    // function name
+                    strncpy(unknown->name, "__unknown__", MAXSIZE);
+                    strncpy(unknown->key, "__unknown__:0", MAXSIZE);
+                    unknown->unknown = 1;
+
+                    // add node to hash
+                    HASH_ADD_STR(graph, key, unknown);
                 }
 
-                if (i == MAXCHILD) {
-                    fprintf(stderr, "Error: out of range for MAXCHILD: %d\n", i);
-                    exit(-1);
+                unknown->parent = node;
+
+                list = node->list;
+                if (!list) {
+                    if ((list = malloc(sizeof(LIST))) == NULL) {
+                        fprintf(stderr, "malloc fail\n");
+                        exit(-1);
+                    }
+
+                    node->list = list;
+                    list->next = NULL;
+                    list->child = unknown;
+                } else {
+                    for(i=0; i<MAXCHILD && list->next != NULL; i++) {
+                        if (!strcmp(unknown->name, list->child->name)) {
+                            found = 1;
+                            break;
+                        }
+                        list = list->next;
+                    }
+
+                    if (!strcmp(unknown->name, list->child->name)) {
+                        found = 1;
+                    }
+
+                    if (!found) {
+                        if ((ptr = malloc(sizeof(LIST))) == NULL) {
+                            fprintf(stderr, "malloc fail\n");
+                            exit(-1);
+                        }
+
+                        list->next = ptr;
+                        ptr->next = NULL;
+                        ptr->child = unknown;
+                    }
+
+                    if (i == MAXCHILD) {
+                        fprintf(stderr, "Error: out of range for MAXCHILD: %d\n", i);
+                        exit(-1);
+                    }
                 }
             }
 

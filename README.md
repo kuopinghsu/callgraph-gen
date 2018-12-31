@@ -90,7 +90,7 @@ Recomment use <A Href="https://pp.ipd.kit.edu/firm/yComp.html">yComp</A> to brow
 
 # Limitations
 
-- Can not generate the call stack for ARM
+- Generating the call stack for ARM (experimental)
 
 # License
 MIT license
