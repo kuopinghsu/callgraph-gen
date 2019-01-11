@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <getopt.h>
 
+#define PCRE2_STATIC
 #define PCRE2_CODE_UNIT_WIDTH 8
 #include <pcre2.h>
 
