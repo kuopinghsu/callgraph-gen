@@ -950,7 +950,7 @@ void gen_graph_vcg(char *filename, int only_linked) {
             snprintf(frame, sizeof(frame), "\\nFRAME: %d", s->frame_size);
 
         if (s->unknown || (s->prog_size == 0))
-            color = "darkgrey";
+            color = "lightgrey";
         else if (s->mark)
             color = "white";
         else if (s->recursived)
@@ -985,24 +985,26 @@ void gen_graph_vcg(char *filename, int only_linked) {
             list = list->next;
         }
 
+        if (i != 0) fprintf(fp, "\n");
+
         if (s->recursived == 1) {
-            fprintf(fp, "  edge: { sourcename: \"%s\" targetname: \"%s\" color: darkblue linestyle: dashed }\n\n",
+            fprintf(fp, "  edge: { sourcename: \"%s\" targetname: \"%s\" color: darkblue linestyle: dashed }\n",
                 s->key, s->key);
         }
 
         if (s->recursived == 2) {
-            fprintf(fp, "  node: { title: \"__r:%d\" color: darkgrey shape: rhomb width: 5 height: 5 }\n\n", recursive_count);
-            fprintf(fp, "  edge: { sourcename: \"%s\" targetname: \"__r:%d\" color: darkblue linestyle: dashed }\n\n",
+            fprintf(fp, "  node: { title: \"__r:%d\" color: darkgrey shape: rhomb width: 5 height: 5 }\n", recursive_count);
+            fprintf(fp, "  edge: { sourcename: \"%s\" targetname: \"__r:%d\" color: darkblue linestyle: dashed }\n",
                 s->key, recursive_count++);
         }
 
         if (s->recursived == 3) {
-            fprintf(fp, "  node: { title: \"__r:%d\" color: darkgrey shape: rhomb width:5 height:5 }\n\n", recursive_count);
-            fprintf(fp, "  edge: { sourcename: \"__r:%d\" targetname: \"%s\" color: darkblue linestyle: dashed }\n\n",
+            fprintf(fp, "  node: { title: \"__r:%d\" color: darkgrey shape: rhomb width:5 height:5 }\n", recursive_count);
+            fprintf(fp, "  edge: { sourcename: \"__r:%d\" targetname: \"%s\" color: darkblue linestyle: dashed }\n",
                 recursive_count++, s->key);
         }
 
-        if (i != 0) fprintf(fp, "\n");
+        if (s->recursived != 0) fprintf(fp, "\n");
     }
 
     fprintf(fp, "}\n");
