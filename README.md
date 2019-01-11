@@ -1,6 +1,9 @@
 # Callgraph Generator
 Generating the call graph from elf binary file
 
+# Binary Released
+- Windows 32-bit application <A Href="https://github.com/kuopinghsu/callgraph-gen/blob/master/release/graphgen.exe.7z"> here </A>
+
 # Getting Started
 It requires following library to build the code.
 
