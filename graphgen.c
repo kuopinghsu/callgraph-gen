@@ -128,12 +128,13 @@ void usage(void) {
 
 // strip space
 char * trim(char * s) {
+    char str[MAXSIZE];
     int l = strlen(s);
 
     while(isspace(s[l - 1])) --l;
     while(* s && isspace(* s)) ++s, --l;
 
-    return strndup(s, l);
+    return strncpy(str, s, l);
 }
 
 // generate ignore list to hash
