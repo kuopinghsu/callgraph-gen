@@ -766,6 +766,11 @@ void traverse(NODE *node) {
             tn->tag = 0;
             HASH_ADD_STR(tnode, name, tn);
         } else {
+
+            if (tn->tag) {
+                list->child->recursived = 3;
+            }
+
             {
                 NODE *node_new;
 
@@ -789,7 +794,7 @@ void traverse(NODE *node) {
 
             // detect recursive
             if (tn->tag) {
-                list->child->recursived = 1;
+                list->child->recursived = 2;
                 list->child->traversed = 1;
                 list->child->list = NULL;
                 fprintf(stderr, "warnning: detect recursive funcion call at %s\n", list->child->name);
@@ -911,6 +916,7 @@ void gen_graph_vcg(char *filename, int only_linked) {
     int i;
     NODE *s, *tmp;
     LIST *list;
+    int recursive_count = 0;
 
     if ((fp = fopen(filename, "w")) == NULL) {
         printf("Can not create file %s\n", filename);
@@ -944,7 +950,7 @@ void gen_graph_vcg(char *filename, int only_linked) {
             snprintf(frame, sizeof(frame), "\\nFRAME: %d", s->frame_size);
 
         if (s->unknown || (s->prog_size == 0))
-            color = "aquamarine";
+            color = "darkgrey";
         else if (s->mark)
             color = "white";
         else if (s->recursived)
@@ -979,9 +985,21 @@ void gen_graph_vcg(char *filename, int only_linked) {
             list = list->next;
         }
 
-        if (s->recursived) {
-            fprintf(fp, "  edge: { sourcename: \"%s\" targetname: \"%s\" color: darkblue }\n",
+        if (s->recursived == 1) {
+            fprintf(fp, "  edge: { sourcename: \"%s\" targetname: \"%s\" color: darkblue linestyle: dashed }\n\n",
                 s->key, s->key);
+        }
+
+        if (s->recursived == 2) {
+            fprintf(fp, "  node: { title: \"__r:%d\" color: darkgrey shape: rhomb width: 5 height: 5 }\n\n", recursive_count);
+            fprintf(fp, "  edge: { sourcename: \"%s\" targetname: \"__r:%d\" color: darkblue linestyle: dashed }\n\n",
+                s->key, recursive_count++);
+        }
+
+        if (s->recursived == 3) {
+            fprintf(fp, "  node: { title: \"__r:%d\" color: darkgrey shape: rhomb width:5 height:5 }\n\n", recursive_count);
+            fprintf(fp, "  edge: { sourcename: \"__r:%d\" targetname: \"%s\" color: darkblue linestyle: dashed }\n\n",
+                recursive_count++, s->key);
         }
 
         if (i != 0) fprintf(fp, "\n");
