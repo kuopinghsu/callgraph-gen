@@ -135,7 +135,9 @@ char * trim(char * s) {
     while(isspace(s[l - 1])) --l;
     while(* s && isspace(* s)) { ++s, --l; }
 
-    return strncpy(str, s, l);
+    strncpy(str, s, l);
+    str[l] = 0;
+    return str;
 }
 
 // generate ignore list to hash
