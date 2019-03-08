@@ -29,6 +29,7 @@ int frame_pointer = 0;
 int recursived = 0;
 int indirect = 0;
 int stack_info = 0;
+int nostack = 0;
 
 // specify the ignore list
 char ignore_list[4096] = "";
@@ -102,8 +103,9 @@ void usage(void) {
 "    --max n, -m n           max depth (default 256)\n"
 "    --graph, -g             generate call graph (default)\n"
 "    --tree, -t              generate call tree\n"
-"    --vcg                   generate vcg graph (default)\n"
-"    --dot                   generate dot graph\n"
+"    --nostack, -k           do not gather statck size\n"
+"    --vcg, -c               generate vcg graph (default)\n"
+"    --dot, -d               generate dot graph\n"
 "    --ignore list, -i list  ignore list\n"
 "    --help, -h              help\n"
 "\n");
@@ -354,7 +356,7 @@ int create_graph(char *filename) {
                 // update stack size
                 node->stack_size = stack;
 
-                stack_info = 1;
+                if (!nostack) stack_info = 1;
 
                 continue;
             }
@@ -381,7 +383,7 @@ int create_graph(char *filename) {
                 // update stack size
                 node->stack_size = stack;
 
-                stack_info = 1;
+                if (!nostack) stack_info = 1;
 
                 continue;
             }
@@ -1089,7 +1091,7 @@ int main(int argc, char **argv) {
     char infile[MAXSIZE];
     char outfile[MAXSIZE];
 
-    const char *optstring = "a:vm:gtr:i:hcd";
+    const char *optstring = "a:vm:gtr:i:hcdk";
     int c;
     struct option opts[] = {
        {"target", 1, NULL, 'a'},
@@ -1098,6 +1100,7 @@ int main(int argc, char **argv) {
        {"graph", 0, NULL, 'g'},
        {"tree", 0, NULL, 't'},
        {"root", 1, NULL, 'r'},
+       {"nostack", 0, NULL, 'k'},
        {"ignore", 1, NULL, 'i'},
        {"help", 0, NULL, 'h'},
        {"vcg", 0, NULL, 'c'},
@@ -1150,6 +1153,9 @@ int main(int argc, char **argv) {
                 break;
             case 'd':
                 vcg = 0;
+                break;
+            case 'k':
+                nostack = 1;
                 break;
             default:
                 printf("Unknown option");
