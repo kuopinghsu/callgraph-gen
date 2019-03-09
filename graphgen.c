@@ -94,7 +94,7 @@ void usage(void) {
     int i;
 
     printf(
-"Generate call graph of a elf binary file.\n\n"
+"Generate call graph of a elf binary file. " __DATE__ " build\n\n"
 "Usage:\n"
 "    graphgen [-v] [-a target] [-m n] [-g | -t] [-c | -d] [-r name]\n"
 "             [-i list] [-h] asm_file vcg_file\n\n"
@@ -124,7 +124,7 @@ void usage(void) {
 "    $ graphgen --max 10 --tree --ignore abort,exit infile.s outfile.vcg\n"
 "\n"
 "    maximun tree depth is 10, generate a call tree, ignode function abort, and\n"
-"    exit\n"
+"    exit\n\n"
 );
 
 }
