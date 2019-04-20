@@ -16,7 +16,7 @@
 #include "uthash.h"
 #include "graphgen.h"
 
-#define MAXSIZE 128
+#define MAXSIZE 1024
 #define MAXREG  64
 #define MAXCHILD 2048
 #define DEFAULT_MAXDEPTH 256
@@ -419,7 +419,7 @@ int create_graph(char *filename) {
             }
         }
 
-        // funcation call
+        // function call
         ovector = regex(re, match_data, (PCRE2_SPTR8)line, (PCRE2_SPTR8)
                   ITEM_CALL);
         if (ovector != NULL) {
@@ -454,7 +454,7 @@ int create_graph(char *filename) {
             HASH_FIND_STR(graph, key, s);
 
             if (!s) {
-                // allocat a node
+                // allocate a node
                 s = node_dup(NULL);
 
                 // function name
@@ -514,7 +514,7 @@ int create_graph(char *filename) {
             continue;
         }
 
-        // indirect funcation call
+        // indirect function call
         ovector = regex(re, match_data, (PCRE2_SPTR8)line, (PCRE2_SPTR8)
                   ITEM_CALLR);
         if (ovector != NULL) {
@@ -553,7 +553,7 @@ int create_graph(char *filename) {
                 HASH_FIND_STR(graph, key, s);
 
                 if (!s) {
-                    // allocat a node
+                    // allocate a node
                     s = node_dup(NULL);
 
                     // function name
@@ -605,11 +605,16 @@ int create_graph(char *filename) {
                         exit(-1);
                     }
                 }
+
+                if (VERBOSE && !found) {
+                    printf("add %s to %s\n", s->name, node->name);
+                }
+
             } else {
                 indirect = 1;
 
                 if (unknown == NULL) {
-                    // allocat a node
+                    // allocate a node
                     unknown = node_dup(NULL);
 
                     // function name
@@ -662,10 +667,10 @@ int create_graph(char *filename) {
                         exit(-1);
                     }
                 }
-            }
 
-            if (VERBOSE && !found) {
-                printf("add %s to %s\n", unknown->name, node->name);
+                if (VERBOSE && !found) {
+                    printf("add %s to %s\n", unknown->name, node->name);
+                }
             }
 
             continue;
@@ -1190,4 +1195,3 @@ int main(int argc, char **argv) {
 
     return 0;
 }
-
