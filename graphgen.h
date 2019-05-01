@@ -8,11 +8,13 @@ int target = 0;
 
 typedef struct _ARCH {
     char *name;
+    int   multiline;
     char *pat[6];
 } ARCH;
 
 ARCH arch[] = {
     { .name = "riscv",
+      .multiline = 0,
       .pat = {
         // function name declaration
         "^([0-9A-Fa-f]+)\\s+<([^\\+^\\-]+)>:",
@@ -23,12 +25,13 @@ ARCH arch[] = {
         // loadr
         "",
         // function call
-        "^\\s*([0-9A-Fa-f]+):.+\\s+jal\\s+\\S+,[0-9A-Fa-f]+\\s+<(.+)>",
+        "^\\s*([0-9A-Fa-f]+):.+\\s+(jal)\\s+\\S+,[0-9A-Fa-f]+\\s+<(.+)>",
         // indirect function call
-        "^\\s*([0-9A-Fa-f]+):.+\\s+jalr\\s+(\\S+)"
+        "^\\s*([0-9A-Fa-f]+):.+\\s+(jalr)\\s+(\\S+)"
       }
     },
     { .name = "arm",
+      .multiline = 0,
       .pat = {
         // function name delcaration
         "^([0-9A-Fa-f]+)\\s+<([^\\+^\\-]+)>:",
@@ -39,12 +42,13 @@ ARCH arch[] = {
         // loadr
         "",
         // function call
-        "^\\s*([0-9A-Fa-f]+):.+\\s+bl\\s+[0-9A-Fa-f]+\\s+<(.+)>",
+        "^\\s*([0-9A-Fa-f]+):.+\\s+(bl)\\s+[0-9A-Fa-f]+\\s+<(.+)>",
         // indirect function call
-        "^\\s*([0-9A-Fa-f]+):.+\\s+blx\\s+(\\S+)"
+        "^\\s*([0-9A-Fa-f]+):.+\\s+(blx)\\s+(\\S+)"
       }
     },
     { .name = "openrisc",
+      .multiline = 0,
       .pat = {
         // function name delcaration
         "^([0-9A-Fa-f]+)\\s+<([^\\+^\\-]+)>:",
@@ -55,13 +59,14 @@ ARCH arch[] = {
         // loadr
         "",
         // function call
-        "^\\s*([0-9A-Fa-f]+):.+\\s+l\\.jal\\s+[0-9A-Fa-f]+\\s+<(.+)>",
+        "^\\s*([0-9A-Fa-f]+):.+\\s+(l\\.jal)\\s+[0-9A-Fa-f]+\\s+<(.+)>",
         // indirect function call
-        "^\\s*([0-9A-Fa-f]+):.+\\s+l\\.jalr\\s+(\\S+)"
+        "^\\s*([0-9A-Fa-f]+):.+\\s+(l\\.jalr)\\s+(\\S+)"
       }
     },
 };
 
+#define MULTILINE  arch[target].multiline
 #define ITEM_FUNC  arch[target].pat[0]
 #define ITEM_STACK arch[target].pat[1]
 #define ITEM_PUSH  arch[target].pat[2]

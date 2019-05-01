@@ -43,6 +43,7 @@ char regmap[MAXREG][MAXSIZE];
 
 typedef struct _LIST {
     struct _NODE *child;
+    int           attr;
     struct _LIST *next;
 } LIST;
 
@@ -358,7 +359,7 @@ int create_graph(char *filename) {
 
                 if (!nostack) stack_info = 1;
 
-                continue;
+                if (!MULTILINE) continue;
             }
         }
 
@@ -385,7 +386,7 @@ int create_graph(char *filename) {
 
                 if (!nostack) stack_info = 1;
 
-                continue;
+                if (!MULTILINE) continue;
             }
         }
 
@@ -415,7 +416,7 @@ int create_graph(char *filename) {
                     for(i=0; regmap[reg][i] != 0 && i < MAXSIZE; i++)
                         if (regmap[reg][i] == '+' || regmap[reg][i] == '-') regmap[reg][i] = '_';
                 }
-                continue;
+                if (!MULTILINE) continue;
             }
         }
 
@@ -427,6 +428,7 @@ int create_graph(char *filename) {
             NODE *s;
             LIST *ptr;
             LIST *list;
+            int stackoff = 0;
             int found = 0;
             char key[MAXSIZE];
 
@@ -434,7 +436,13 @@ int create_graph(char *filename) {
             getop(buf, line, ovector, 1);
             sscanf(buf, "%x", &PC);
 
-            getop(name, line, ovector, 2);
+            getop(buf, line, ovector, 2);
+            int windows = buf[strlen(buf)-1] - '0';
+            if (windows >= 0 && windows <= 9) { // digits
+                stackoff = windows * 4;
+            }
+
+            getop(name, line, ovector, 3);
 
             // modify the function name
             for(i=0; name[i] != 0 && i < MAXSIZE; i++)
@@ -475,6 +483,7 @@ int create_graph(char *filename) {
                 }
 
                 node->list = list;
+                list->attr = stackoff;
                 list->next = NULL;
                 list->child = s;
             } else {
@@ -497,6 +506,7 @@ int create_graph(char *filename) {
                     }
 
                     list->next = ptr;
+                    ptr->attr = stackoff;
                     ptr->next = NULL;
                     ptr->child = s;
                 }
@@ -511,7 +521,7 @@ int create_graph(char *filename) {
                 printf("add %s to %s\n", s->name, node->name);
             }
 
-            continue;
+            if (!MULTILINE) continue;
         }
 
         // indirect function call
@@ -520,6 +530,7 @@ int create_graph(char *filename) {
         if (ovector != NULL) {
             LIST *ptr;
             LIST *list;
+            int stackoff = 0;
             int found = 0;
             int reg;
 
@@ -528,6 +539,12 @@ int create_graph(char *filename) {
             sscanf(buf, "%x", &PC);
 
             getop(buf, line, ovector, 2);
+            int windows = buf[strlen(buf)-1] - '0';
+            if (windows >= 0 && windows <= 9) { // digits
+                stackoff = windows * 4;
+            }
+
+            getop(buf, line, ovector, 3);
             reg = atoi(buf);
 
             if (regmap[reg][0]) {
@@ -574,6 +591,7 @@ int create_graph(char *filename) {
                     }
 
                     node->list = list;
+                    list->attr = stackoff;
                     list->next = NULL;
                     list->child = s;
                 } else {
@@ -596,6 +614,7 @@ int create_graph(char *filename) {
                         }
 
                         list->next = ptr;
+                        ptr->attr = stackoff;
                         ptr->next = NULL;
                         ptr->child = s;
                     }
@@ -636,6 +655,7 @@ int create_graph(char *filename) {
                     }
 
                     node->list = list;
+                    list->attr = stackoff;
                     list->next = NULL;
                     list->child = unknown;
                 } else {
@@ -658,6 +678,7 @@ int create_graph(char *filename) {
                         }
 
                         list->next = ptr;
+                        ptr->attr = stackoff;
                         ptr->next = NULL;
                         ptr->child = unknown;
                     }
@@ -673,7 +694,7 @@ int create_graph(char *filename) {
                 }
             }
 
-            continue;
+            if (!MULTILINE) continue;
         }
 
         // get current PC
@@ -717,7 +738,7 @@ void mark_tree(NODE *node) {
 int maxdepth = 0;
 int max_frame = 0;
 NODE *mark_node = NULL;
-void traverse(NODE *node) {
+void traverse(NODE *node, int attr) {
     int i;
     LIST *list;
     TNODE *t;
@@ -731,7 +752,7 @@ void traverse(NODE *node) {
         exit(-1);
     }
 
-    frame_pointer += node->stack_size;
+    frame_pointer += (node->stack_size + attr);
     t->tag = 1;
     node->traversed = 1;
     node->frame_size = frame_pointer;
@@ -748,7 +769,7 @@ void traverse(NODE *node) {
     if (!list) {
         t->tag = 0;
         maxdepth--;
-        frame_pointer -= node->stack_size;
+        frame_pointer -= (node->stack_size + attr);
         return;
     }
 
@@ -758,7 +779,7 @@ void traverse(NODE *node) {
         t->tag = 0;
         node->list = 0;
         maxdepth--;
-        frame_pointer -= node->stack_size;
+        frame_pointer -= (node->stack_size + attr);
         return;
     }
 
@@ -815,10 +836,10 @@ void traverse(NODE *node) {
 
         list->child->parent = node;
 
-        traverse(list->child);
+        traverse(list->child, list->attr);
     }
 
-    frame_pointer -= node->stack_size;
+    frame_pointer -= (node->stack_size + attr);
     t->tag = 0;
     maxdepth--;
 }
@@ -859,7 +880,7 @@ void create_tree(char *name) {
                 t->id = r->node->id;
                 HASH_ADD_STR(tnode, name, t);
             }
-            traverse(r->node);
+            traverse(r->node, 0);
             mark_tree(mark_node);
             r->frame_size = max_frame;
             if (VERBOSE) printf("root: %s\n", r->node->name);
@@ -888,7 +909,7 @@ void create_tree(char *name) {
 
             max_frame = 0;
             mark_node = NULL;
-            traverse(s);
+            traverse(s, 0);
             mark_tree(mark_node);
             printf("== stack summary ==\n");
             if (max_frame != 0)
@@ -1195,3 +1216,4 @@ int main(int argc, char **argv) {
 
     return 0;
 }
+
