@@ -12,7 +12,11 @@ It requires following library to build the code.
 
 - PCRE: Perl Compatible Regular Expressions https://www.pcre.org/
 
-Install the PCRE library to /usr/local directory.
+Install the PCRE library to /usr/local directory. Or insatall libpcre2-dev package on Ubuntu.
+
+```
+$ sudo apt install libpcre2-dev
+```
 
 Checkout the repository and initialize all submodules
 
