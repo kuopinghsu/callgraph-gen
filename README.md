@@ -12,10 +12,10 @@ It requires following library to build the code.
 
 - PCRE: Perl Compatible Regular Expressions https://www.pcre.org/
 
-Install the PCRE library to /usr/local directory. Or insatall libpcre2-dev package on Ubuntu.
+Install the PCRE library and libxml2 directory. Or insatall libpcre2-dev and libxml2-dev package on Ubuntu.
 
 ```
-$ sudo apt install libpcre2-dev
+$ sudo apt install libpcre2-dev libxml2-dev
 ```
 
 Checkout the repository and initialize all submodules
@@ -40,31 +40,39 @@ $ make
 
 # Usage
 ```
-Generate call graph of a elf binary file.
+Generate call graph of a elf binary file. Apr 18 2020 build
 
 Usage:
-    graphgen [-v] [-a target] [-m n] [-g | -t] [-c | -d] [-r name]
-             [-i list] [-h] asm_file vcg_file
+    graphgen [-v] [-a target] [-x file] [-r function_name] [-m n]
+             [-g | -t] [-c | -d] [-r name] [-i list] [-h]
+             asm_file vcg_file
 
     --verbose, -v           verbose output
     --target name, -a name  specify the target (see support target below)
+    --xml file, -x file     read config file
+    --root func, -r func    specify the root function
     --max n, -m n           max depth (default 256)
     --graph, -g             generate call graph (default)
     --tree, -t              generate call tree
-    --vcg                   generate vcg graph (default)
-    --dot                   generate dot graph
+    --nostack, -k           do not gather statck size
+    --vcg, -c               generate vcg graph (default)
+    --dot, -d               generate dot graph
     --ignore list, -i list  ignore list
     --help, -h              help
 
 Support target:
-    riscv (default)
-    arm
-    openrisc
 
 Example:
+
     $ graphgen --max 10 --tree --ignore abort,exit infile.s outfile.vcg
 
-    maximun tree depth is 10, generate a call tree, ignode function abort, and exit
+    maximun tree depth is 10, generate a call tree, ignode function abort, and
+    exit.
+
+    $ graphgen --xml contrib/xtensa.xml --tree --root printf infile.s outfile.vcg
+
+    Use a user-defined processor to generate a call tree from printf function.
+
 ```
 
 This is an example to show the call tree of RISC-V's dhrystone diag. Using binutils to generate the assembly file

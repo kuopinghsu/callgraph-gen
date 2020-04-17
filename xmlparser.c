@@ -15,67 +15,88 @@ parse_xml_array (char *buf, int len)
     xmlDocPtr doc;
     xmlNodePtr root, node, detail;
     xmlChar *name, *value;
+
     target = -1;
     doc = xmlParseMemory (buf, len);    //parse xml in memory
+
     if (doc == NULL) {
         if (VERBOSE) printf ("doc == null\n");
         return -1;
     }
+
     root = xmlDocGetRootElement (doc);
+
     for (node = root->children; node; node = node->next) {
         if (xmlStrcasecmp (node->name, BAD_CAST "content") == 0)
             break;
     }
+
     if (node == NULL) {
         if (VERBOSE) printf ("no node = content\n");
         return -1;
     }
+
     for (node = node->children; node; node = node->next) {
         if (xmlStrcasecmp (node->name, BAD_CAST "ncore") == 0) {    //get pro node
             name = xmlGetProp (node, BAD_CAST "id");
             value = xmlNodeGetContent (node);
+
             if (VERBOSE) printf ("this is %s: %s\n", (char *) name, (char *) value); //get value, CDATA is not parse and don't take into value
+
             sizeof_arch = atoi((char*) value);
+
             if (sizeof_arch <= 0) {
                 fprintf(stderr, "ncore <= 0\n");
                 return -1;
             }
+
             if ((_arch = malloc(sizeof_arch * sizeof(ARCH))) == NULL) {
                 fprintf(stderr, "malloc fail\n");
                 return -1;
             }
+
             xmlFree (name);
             xmlFree (value);
         } else if (xmlStrcasecmp (node->name, BAD_CAST "core") == 0) {  //get pro node
             char *str;
+
             name = xmlGetProp (node, BAD_CAST "id");
             value = xmlNodeGetContent (node);
+
             if (VERBOSE) printf ("this is %s: %s\n", (char *) name, (char *) value); //get value, CDATA is not parse and don't take into value
+
             target++;
             if ((str = malloc(strlen((char*) value)+1)) == NULL) {
                 fprintf(stderr, "malloc fail\n");
                 return -1;
             }
+
             strcpy(str, (char*)value);
             ITEM_NAME = str;
+
             xmlFree (name);
             xmlFree (value);
         } else if (xmlStrcasecmp (node->name, BAD_CAST "details") == 0) {   //get details node
             for (detail = node->children; detail; detail = detail->next) {  //traverse detail node
                 if (xmlStrcasecmp (detail->name, BAD_CAST "detail") == 0) {
                     char *str;
+
                     name = xmlGetProp (detail, BAD_CAST "name");
                     value = xmlNodeGetContent (detail);
+
                     if (strlen ((char *) value) != 0) {
                         if (VERBOSE) printf ("%s : %s\n", (char *) name, (char *) value);
                     } else {
                         if (VERBOSE) printf ("%s has no value\n", (char *) name);
                     }
+
                     if ((str = malloc(strlen((char*) value)+1)) == NULL) {
                         fprintf(stderr, "malloc fail\n");
                         return -1;
                     }
+
                     strcpy(str, (char*)value);
+
                     if (!strcmp((char*)name, "func")) {
                         ITEM_FUNC = str;
                     } else if (!strcmp((char*)name, "stack")) {
@@ -92,12 +113,14 @@ parse_xml_array (char *buf, int len)
                         MULTILINE = atoi((char*) str);
                         free(str);
                     }
+
                     xmlFree (name);
                     xmlFree (value);
                 }
             }
         }
     }
+
     xmlFreeDoc (doc);
     return 0;
 }
@@ -108,6 +131,7 @@ xmlparse (char *xmlfile)
     char   *content;
     unsigned long filesize;
     FILE   *file;
+
     if (!xmlfile) return 1;
     if (!xmlfile[0]) return 1;
 
@@ -115,20 +139,25 @@ xmlparse (char *xmlfile)
         fprintf (stderr, "openf file %s error", xmlfile);
         return 0;
     }
+
     fseek (file, 0, SEEK_END);
     filesize = ftell (file);
     rewind (file);
     content = (char *) malloc (filesize + 1);
     memset (content, 0, filesize + 1);
+
     if (fread (content, 1, filesize, file) != filesize) {
         fprintf (stderr, "file %s read failed", xmlfile);
         return 0;
     }
+
     fclose (file);
+
     if (parse_xml_array (content, filesize) < 0) {
         fprintf (stderr, "parse xml %s failed\n", xmlfile);
         return 0;
     }
+
     return 1;
 }
 

@@ -13,6 +13,7 @@
 #define PCRE2_CODE_UNIT_WIDTH 8
 #include <pcre2.h>
 
+#define __DEF_ARRAY__
 #include "uthash.h"
 #include "graphgen.h"
 
@@ -22,7 +23,7 @@
 #define DEFAULT_MAXDEPTH 256
 
 int MAXDEPTH = DEFAULT_MAXDEPTH;
-int VERBOSE = 0;
+int VERBOSE = 1;
 int tree = 0;
 int vcg = 1;
 int frame_pointer = 0;
@@ -38,6 +39,9 @@ char ignore_list[4096] = "";
 char root_node[MAXSIZE] = "";
 
 char regmap[MAXREG][MAXSIZE];
+
+// xml file
+char xmlfile[MAXSIZE] = "";
 
 #define getop(dst, src, ovector, n) snprintf(dst, MAXSIZE, "%.*s", (int)(ovector[2*(n)+1] - ovector[2*(n)]), (src + ovector[2*(n)]))
 
@@ -91,16 +95,22 @@ ROOT   *root = NULL;            // root node
 TNODE  *tnode = NULL;           // tag node
 STRING *ignore = NULL;          // ignore node
 
+extern char default_xml[];
+extern int default_xml_len;
+
 void usage(void) {
     int i;
 
     printf(
 "Generate call graph of a elf binary file. " __DATE__ " build\n\n"
 "Usage:\n"
-"    graphgen [-v] [-a target] [-m n] [-g | -t] [-c | -d] [-r name]\n"
-"             [-i list] [-h] asm_file vcg_file\n\n"
+"    graphgen [-v] [-a target] [-x file] [-r function_name] [-m n]\n"
+"             [-g | -t] [-c | -d] [-r name] [-i list] [-h]\n"
+"             asm_file vcg_file\n\n"
 "    --verbose, -v           verbose output\n"
 "    --target name, -a name  specify the target (see support target below)\n"
+"    --xml file, -x file     read config file\n"
+"    --root func, -r func    specify the root function\n"
 "    --max n, -m n           max depth (default 256)\n"
 "    --graph, -g             generate call graph (default)\n"
 "    --tree, -t              generate call tree\n"
@@ -112,11 +122,11 @@ void usage(void) {
 "\n");
 
     printf("Support target:\n");
-    for(i=0; i<sizeof(arch)/sizeof(ARCH); i++) {
+    for(i=0; i<sizeof_arch; i++) {
         if (i == 0) {
-            printf("    %s (default)\n", arch[i].name);
+            printf("    %s (default)\n", _arch[i].name);
         } else {
-            printf("    %s\n", arch[i].name);
+            printf("    %s\n", _arch[i].name);
         }
     }
 
@@ -125,7 +135,12 @@ void usage(void) {
 "    $ graphgen --max 10 --tree --ignore abort,exit infile.s outfile.vcg\n"
 "\n"
 "    maximun tree depth is 10, generate a call tree, ignode function abort, and\n"
-"    exit\n\n"
+"    exit.\n"
+"\n"
+"    $ graphgen --xml contrib/xtensa.xml --tree --root printf infile.s outfile.vcg\n"
+"\n"
+"    Use a user-defined processor to generate a call tree from printf function.\n"
+"\n"
 );
 
 }
@@ -138,7 +153,7 @@ char * trim(char * s) {
     while(isspace(s[l - 1])) --l;
     while(* s && isspace(* s)) { ++s, --l; }
 
-    strncpy(str, s, l);
+    strncpy(str, s, l-1);
     str[l] = 0;
     return str;
 }
@@ -159,7 +174,7 @@ void generate_ignore(void) {
                 exit(-1);
             }
 
-            strncpy(str->name, func_name, MAXSIZE);
+            strncpy(str->name, func_name, MAXSIZE-1);
             HASH_ADD_STR(ignore, name, str);
         }
 
@@ -313,7 +328,7 @@ int create_graph(char *filename) {
                 node = node_dup(NULL);
 
                 // function name
-                strncpy(node->name, name, MAXSIZE);
+                strncpy(node->name, name, MAXSIZE-1);
                 snprintf(node->key, MAXSIZE, "%s:0", name);
 
                 // add node to hash
@@ -410,7 +425,7 @@ int create_graph(char *filename) {
                 getop(buf, line, ovector, 3);
 
                 if (reg < MAXREG) {
-                    strncpy(regmap[reg], buf, MAXSIZE);
+                    strncpy(regmap[reg], buf, MAXSIZE-1);
 
                     // modify the function name
                     for(i=0; regmap[reg][i] != 0 && i < MAXSIZE; i++)
@@ -466,7 +481,7 @@ int create_graph(char *filename) {
                 s = node_dup(NULL);
 
                 // function name
-                strncpy(s->name, name, MAXSIZE);
+                strncpy(s->name, name, MAXSIZE-1);
                 snprintf(s->key, MAXSIZE, "%s:0", name);
 
                 // add node to hash
@@ -574,7 +589,7 @@ int create_graph(char *filename) {
                     s = node_dup(NULL);
 
                     // function name
-                    strncpy(s->name, regmap[reg], MAXSIZE);
+                    strncpy(s->name, regmap[reg], MAXSIZE-1);
                     snprintf(s->key, MAXSIZE, "%s:0", regmap[reg]);
 
                     // add node to hash
@@ -637,8 +652,8 @@ int create_graph(char *filename) {
                     unknown = node_dup(NULL);
 
                     // function name
-                    strncpy(unknown->name, "__unknown__", MAXSIZE);
-                    strncpy(unknown->key, "__unknown__:0", MAXSIZE);
+                    strncpy(unknown->name, "__unknown__", MAXSIZE-1);
+                    strncpy(unknown->key, "__unknown__:0", MAXSIZE-1);
                     unknown->unknown = 1;
 
                     // add node to hash
@@ -793,7 +808,7 @@ void traverse(NODE *node, int attr) {
                 fprintf(stderr, "malloc error\n");
                 exit(-1);
             }
-            strncpy(tn->name, list->child->name, MAXSIZE);
+            strncpy(tn->name, list->child->name, MAXSIZE-1);
             tn->id = list->child->id;
             tn->tag = 0;
             HASH_ADD_STR(tnode, name, tn);
@@ -857,7 +872,7 @@ void create_tree(char *name) {
                     fprintf(stderr, "malloc fail\n");
                     exit(-1);
                 }
-                strncpy(r->name, s->name, sizeof(MAXSIZE));
+                strncpy(r->name, s->name, MAXSIZE-1);
                 r->node = s;
                 HASH_ADD_STR(root, name, r);
             }
@@ -875,7 +890,7 @@ void create_tree(char *name) {
                     fprintf(stderr, "malloc fail\n");
                     exit(-1);
                 }
-                strncpy(t->name, r->node->name, MAXSIZE);
+                strncpy(t->name, r->node->name, MAXSIZE-1);
                 t->tag = 0;
                 t->id = r->node->id;
                 HASH_ADD_STR(tnode, name, t);
@@ -901,7 +916,7 @@ void create_tree(char *name) {
                     fprintf(stderr, "malloc fail\n");
                     exit(-1);
                 }
-                strncpy(t->name, s->name, MAXSIZE);
+                strncpy(t->name, s->name, MAXSIZE-1);
                 t->tag = 0;
                 t->id = s->id;
                 HASH_ADD_STR(tnode, name, t);
@@ -1117,10 +1132,11 @@ int main(int argc, char **argv) {
     char infile[MAXSIZE];
     char outfile[MAXSIZE];
 
-    const char *optstring = "a:vm:gtr:i:hcdk";
+    const char *optstring = "a:x:vm:gtr:i:hcdk";
     int c;
     struct option opts[] = {
        {"target", 1, NULL, 'a'},
+       {"xml", 1, NULL, 'x'},
        {"verbose", 0, NULL, 'v'},
        {"max", 1, NULL, 'm'},
        {"graph", 0, NULL, 'g'},
@@ -1139,18 +1155,32 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+    #ifndef __PREDEFINED_ARRAY__
+    if (parse_xml_array (default_xml, default_xml_len) < 0) {
+        fprintf (stderr, "parse default xml failed\n");
+        return 1;
+    }
+    #endif
+
     while((c = getopt_long(argc, argv, optstring, opts, NULL)) != -1) {
         switch(c) {
             case 'a':
-                for(i=0; i<sizeof(arch)/sizeof(ARCH); i++) {
-                    if (!strcmp(optarg, arch[i].name)) break;
+                for(i=0; i<sizeof_arch; i++) {
+                    if (!strcmp(optarg, _arch[i].name)) break;
                 }
-                if (i == sizeof(arch)/sizeof(ARCH)) {
+                if (i == sizeof_arch) {
                     usage();
                     fprintf(stderr, "\n!!Error!! Do not support the target arch '%s'.\n", optarg);
                     return 1;
                 } else {
                     target = i;
+                }
+                break;
+            case 'x':
+                strncpy(xmlfile, optarg, sizeof(xmlfile)-1);
+                if (!xmlparse(xmlfile)) {
+                    fprintf(stderr, "program exit\n");
+                    return 1;
                 }
                 break;
             case 'v':
@@ -1166,10 +1196,10 @@ int main(int argc, char **argv) {
                 tree = 1;
                 break;
             case 'r':
-                strncpy(root_node, optarg, sizeof(root_node));
+                strncpy(root_node, optarg, sizeof(root_node)-1);
                 break;
             case 'i':
-                strncpy(ignore_list, optarg, sizeof(ignore_list));
+                strncpy(ignore_list, optarg, sizeof(ignore_list)-1);
                 break;
             case 'h':
                 usage();
@@ -1195,8 +1225,8 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    strncpy(infile, argv[optind], sizeof(infile));
-    strncpy(outfile, argv[optind+1], sizeof(outfile));
+    strncpy(infile, argv[optind], sizeof(infile)-1);
+    strncpy(outfile, argv[optind+1], sizeof(outfile)-1);
 
     generate_ignore();
     create_graph(infile);

@@ -4,14 +4,14 @@
 #ifndef __GRAPHGEN_H__
 #define __GRAPHGEN_H__
 
-int target = 0;
-
 typedef struct _ARCH {
     char *name;
     int   multiline;
     char *pat[6];
 } ARCH;
 
+#ifdef __DEF_ARRAY__
+#ifdef __PREDEFINED_ARRAY__
 ARCH arch[] = {
     { .name = "riscv",
       .multiline = 0,
@@ -66,13 +66,31 @@ ARCH arch[] = {
     },
 };
 
-#define MULTILINE  arch[target].multiline
-#define ITEM_FUNC  arch[target].pat[0]
-#define ITEM_STACK arch[target].pat[1]
-#define ITEM_PUSH  arch[target].pat[2]
-#define ITEM_LOADR arch[target].pat[3]
-#define ITEM_CALL  arch[target].pat[4]
-#define ITEM_CALLR arch[target].pat[5]
+ARCH *_arch = (ARCH *)arch;
+int sizeof_arch = sizeof(arch)/sizeof(ARCH);
+int target = 0;
+#else // __PREDEFINED_ARRAY__
+ARCH *_arch = NULL;
+int sizeof_arch = 0;
+int target = 0;
+#endif
+#else // __DEF_ARRAY__
+extern ARCH *_arch;
+extern int sizeof_arch;
+extern int target;
+#endif // __DEF_ARRAY__
+
+#define MULTILINE  _arch[target].multiline
+#define ITEM_NAME  _arch[target].name
+#define ITEM_FUNC  _arch[target].pat[0]
+#define ITEM_STACK _arch[target].pat[1]
+#define ITEM_PUSH  _arch[target].pat[2]
+#define ITEM_LOADR _arch[target].pat[3]
+#define ITEM_CALL  _arch[target].pat[4]
+#define ITEM_CALLR _arch[target].pat[5]
+
+int xmlparse(char*);
+int parse_xml_array (char *buf, int len);
 
 #endif // __GRAPHGEN_H__
 
