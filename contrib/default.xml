@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root name="root">
+    <content>
+        <ncore id="ncore">3</ncore>
+
+        <core id="name">riscv</core>
+        <details>
+            <detail name="func"><![CDATA[^([0-9A-Fa-f]+)\s+<([^\+^\-]+)>:]]></detail>
+            <detail name="stack"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+addi\s+sp,sp,\-(\d+)]]></detail>
+            <detail name="push"/>
+            <detail name="loader"/>
+            <detail name="call"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+(jal)\s+\S+,[0-9A-Fa-f]+\s+<(.+)>]]></detail>
+            <detail name="callx"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+(jalr)\s+(\S+)]]></detail>
+            <detail name="multiline">0</detail>
+        </details>
+
+        <core id="name">arm</core>
+        <details>
+            <detail name="func"><![CDATA[^([0-9A-Fa-f]+)\s+<([^\+^\-]+)>:]]></detail>
+            <detail name="stack"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+sub\s+sp,\s*sp,\s*#(\d+)]]></detail>
+            <detail name="push"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+push\s+{(.+)}]]></detail>
+            <detail name="loader"/>
+            <detail name="call"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+(bl)\s+[0-9A-Fa-f]+\s+<(.+)>]]></detail>
+            <detail name="callx"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+(blx)\s+(\S+)]]></detail>
+            <detail name="multiline">0</detail>
+        </details>
+
+        <core id="name">openrisc</core>
+        <details>
+            <detail name="func"><![CDATA[^([0-9A-Fa-f]+)\s+<([^\+^\-]+)>:]]></detail>
+            <detail name="stack"><![CDATA[^\s*([0-9A-Fa-f]+):.+l\.\s+l\.addi\s+r1,\s*r1,\s*\-([0-9A-Fa-fxX]+)]]></detail>
+            <detail name="push"/>
+            <detail name="loader"/>
+            <detail name="call"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+(l\.jal)\s+[0-9A-Fa-f]+\s+<(.+)>]]></detail>
+            <detail name="callx"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+(l\.jalr)\s+(\S+)]]></detail>
+            <detail name="multiline">0</detail>
+        </details>
+    </content>
+</root>
+
