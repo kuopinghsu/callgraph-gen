@@ -1,5 +1,5 @@
-
-SYS := $(shell gcc -dumpmachine)
+CC       = gcc
+SYS     := $(shell gcc -dumpmachine)
 
 ifneq (, $(findstring linux, $(SYS)))
 CFLAGS   = -I/usr/include/libxml2 -Wformat-truncation=0 -Wno-stringop-truncation
@@ -33,8 +33,7 @@ $(EXEFILE): $(OBJECTS)
 
 default_xml.c: contrib/default.xml
 	@cp contrib/default.xml default_xml
-	@xxd -i default_xml > $@
-	@$(RM) default_xml
+	@xxd -i default_xml $@ && $(RM) default_xml
 
 clean:
 	-rm $(EXEFILE) $(OBJECTS) default_xml.c
