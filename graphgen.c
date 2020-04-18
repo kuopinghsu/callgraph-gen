@@ -43,6 +43,8 @@ char regmap[MAXREG][MAXSIZE];
 // xml file
 char xmlfile[MAXSIZE] = "";
 
+#define strncpy_s(dst, src, n) strncpy(dst, src, n); dst[n] = 0;
+
 #define getop(dst, src, ovector, n) snprintf(dst, MAXSIZE, "%.*s", (int)(ovector[2*(n)+1] - ovector[2*(n)]), (src + ovector[2*(n)]))
 
 typedef struct _LIST {
@@ -153,7 +155,7 @@ char * trim(char * s) {
     while(isspace((int)s[l - 1])) --l;
     while(* s && isspace((int)* s)) { ++s, --l; }
 
-    strncpy(str, s, l-1); str[l-1] = 0;
+    strncpy_s(str, s, l-1);
     return str;
 }
 
@@ -174,7 +176,7 @@ void generate_ignore(void) {
                 exit(-1);
             }
 
-            strncpy(str->name, func_name, MAXSIZE-1); str->name[MAXSIZE-1] = 0;
+            strncpy_s(str->name, func_name, MAXSIZE-1);
             HASH_ADD_STR(ignore, name, str);
         }
 
@@ -333,7 +335,7 @@ int create_graph(char *filename) {
                 node = node_dup(NULL);
 
                 // function name
-                strncpy(node->name, name, MAXSIZE-1); node->name[MAXSIZE-1] = 0;
+                strncpy_s(node->name, name, MAXSIZE-1);
                 snprintf(node->key, MAXSIZE, "%s:0", name);
 
                 // add node to hash
@@ -369,7 +371,7 @@ int create_graph(char *filename) {
                 if (buf[0] == '0' && (buf[1] == 'x' || buf[1] == 'X')) {
                     sscanf(buf, "%x", &size);
                 } else {
-                    sscanf(buf, "%d", &size);
+                    sscanf(buf, "%u", &size);
                 }
 
                 stack += size;
@@ -430,7 +432,7 @@ int create_graph(char *filename) {
                 getop(buf, line, ovector, 3);
 
                 if (reg < MAXREG) {
-                    strncpy(regmap[reg], buf, MAXSIZE-1); regmap[reg][MAXSIZE-1] = 0;
+                    strncpy_s(regmap[reg], buf, MAXSIZE-1);
 
                     // modify the function name
                     for(i=0; regmap[reg][i] != 0 && i < MAXSIZE; i++)
@@ -486,7 +488,7 @@ int create_graph(char *filename) {
                 s = node_dup(NULL);
 
                 // function name
-                strncpy(s->name, name, MAXSIZE-1); s->name[MAXSIZE-1] = 0;
+                strncpy_s(s->name, name, MAXSIZE-1);
                 snprintf(s->key, MAXSIZE, "%s:0", name);
 
                 // add node to hash
@@ -593,7 +595,7 @@ int create_graph(char *filename) {
                     s = node_dup(NULL);
 
                     // function name
-                    strncpy(s->name, regmap[reg], MAXSIZE-1); s->name[MAXSIZE-1] = 0;
+                    strncpy_s(s->name, regmap[reg], MAXSIZE-1);
                     snprintf(s->key, MAXSIZE, "%s:0", regmap[reg]);
 
                     // add node to hash
@@ -656,8 +658,8 @@ int create_graph(char *filename) {
                     unknown = node_dup(NULL);
 
                     // function name
-                    strncpy(unknown->name, "__unknown__", MAXSIZE-1); unknown->name[MAXSIZE-1] = 0;
-                    strncpy(unknown->key, "__unknown__:0", MAXSIZE-1); unknown->key[MAXSIZE-1] = 0;
+                    strncpy_s(unknown->name, "__unknown__", MAXSIZE-1);
+                    strncpy_s(unknown->key, "__unknown__:0", MAXSIZE-1);
                     unknown->unknown = 1;
 
                     // add node to hash
@@ -812,7 +814,7 @@ void traverse(NODE *node, int attr) {
                 fprintf(stderr, "malloc error\n");
                 exit(-1);
             }
-            strncpy(tn->name, list->child->name, MAXSIZE-1); tn->name[MAXSIZE-1] = 0;
+            strncpy_s(tn->name, list->child->name, MAXSIZE-1);
             tn->id = list->child->id;
             tn->tag = 0;
             HASH_ADD_STR(tnode, name, tn);
@@ -876,7 +878,7 @@ void create_tree(char *name) {
                     fprintf(stderr, "malloc fail\n");
                     exit(-1);
                 }
-                strncpy(r->name, s->name, MAXSIZE-1); r->name[MAXSIZE-1] = 0;
+                strncpy_s(r->name, s->name, MAXSIZE-1);
                 r->node = s;
                 HASH_ADD_STR(root, name, r);
             }
@@ -894,7 +896,7 @@ void create_tree(char *name) {
                     fprintf(stderr, "malloc fail\n");
                     exit(-1);
                 }
-                strncpy(t->name, r->node->name, MAXSIZE-1); t->name[MAXSIZE-1] = 0;
+                strncpy_s(t->name, r->node->name, MAXSIZE-1);
                 t->tag = 0;
                 t->id = r->node->id;
                 HASH_ADD_STR(tnode, name, t);
@@ -920,7 +922,7 @@ void create_tree(char *name) {
                     fprintf(stderr, "malloc fail\n");
                     exit(-1);
                 }
-                strncpy(t->name, s->name, MAXSIZE-1); t->name[MAXSIZE-1] = 0;
+                strncpy_s(t->name, s->name, MAXSIZE-1);
                 t->tag = 0;
                 t->id = s->id;
                 HASH_ADD_STR(tnode, name, t);
@@ -995,10 +997,10 @@ void gen_graph_vcg(char *filename, int only_linked) {
             continue;
 
         if (stack_info)
-            snprintf(stack, sizeof(stack), "\\nSTACK: %d", s->stack_size);
+            snprintf(stack, sizeof(stack), "\\nSTACK: %u", s->stack_size);
 
         if (tree && stack_info)
-            snprintf(frame, sizeof(frame), "\\nFRAME: %d", s->frame_size);
+            snprintf(frame, sizeof(frame), "\\nFRAME: %u", s->frame_size);
 
         if (s->unknown || (s->prog_size == 0))
             color = "lightgrey";
@@ -1013,7 +1015,7 @@ void gen_graph_vcg(char *filename, int only_linked) {
         fprintf(fp, \
             "  node: {\n" \
             "    title: \"%s\"\n" \
-            "    label: \"%s\\nPROG: %d%s%s\"\n" \
+            "    label: \"%s\\nPROG: %u%s%s\"\n" \
             "    color: %s\n" \
             "  }\n\n",
             s->key,
@@ -1080,16 +1082,16 @@ void gen_graph_dot(char *filename, int only_linked) {
         char stack[MAXSIZE] = "";
         char frame[MAXSIZE] = "";
 
-        if (VERBOSE) printf("%s: callee addr 0x%08x, prog size: %d, stack size: %d\n", s->name, s->pc, s->prog_size, s->stack_size);
+        if (VERBOSE) printf("%s: callee addr 0x%08x, prog size: %u, stack size: %u\n", s->name, s->pc, s->prog_size, s->stack_size);
 
         if (only_linked && !s->traversed)
             continue;
 
         if (stack_info)
-            snprintf(stack, sizeof(stack), "|STACK: %d", s->stack_size);
+            snprintf(stack, sizeof(stack), "|STACK: %u", s->stack_size);
 
         if (tree && stack_info)
-            snprintf(frame, sizeof(frame), "|FRAME: %d", s->frame_size);
+            snprintf(frame, sizeof(frame), "|FRAME: %u", s->frame_size);
 
         if (s->unknown || (s->prog_size == 0))
             color = "aquamarine";
@@ -1102,7 +1104,7 @@ void gen_graph_dot(char *filename, int only_linked) {
 
         // Add dot Node
         fprintf(fp,
-            "  %s_%d [ label = \"%s|PROG: %d%s%s\" color = %s];\n",
+            "  %s_%d [ label = \"%s|PROG: %u%s%s\" color = %s];\n",
             s->name, s->id,
             s->name,
             s->prog_size,
@@ -1181,7 +1183,7 @@ int main(int argc, char **argv) {
                 }
                 break;
             case 'x':
-                strncpy(xmlfile, optarg, sizeof(xmlfile)-1); xmlfile[sizeof(xmlfile)-1] = 0;
+                strncpy_s(xmlfile, optarg, sizeof(xmlfile)-1);
                 if (!xmlparse(xmlfile)) {
                     fprintf(stderr, "program exit\n");
                     return 1;
@@ -1200,10 +1202,10 @@ int main(int argc, char **argv) {
                 tree = 1;
                 break;
             case 'r':
-                strncpy(root_node, optarg, sizeof(root_node)-1); root_node[sizeof(root_node)-1] = 0;
+                strncpy_s(root_node, optarg, sizeof(root_node)-1);
                 break;
             case 'i':
-                strncpy(ignore_list, optarg, sizeof(ignore_list)-1); ignore_list[sizeof(ignore_list)-1] = 0;
+                strncpy_s(ignore_list, optarg, sizeof(ignore_list)-1);
                 break;
             case 'h':
                 usage();
@@ -1229,8 +1231,8 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    strncpy(infile, argv[optind], sizeof(infile)-1); infile[sizeof(infile)-1] = 0;
-    strncpy(outfile, argv[optind+1], sizeof(outfile)-1); outfile[sizeof(outfile)-1] = 0;
+    strncpy_s(infile, argv[optind], sizeof(infile)-1);
+    strncpy_s(outfile, argv[optind+1], sizeof(outfile)-1);
 
     generate_ignore();
     create_graph(infile);

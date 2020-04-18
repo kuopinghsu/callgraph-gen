@@ -1,16 +1,16 @@
 # Callgraph Generator
 Generating the call graph from elf binary file
 
-# Binary Released
-- Windows 64-bit application <A Href="https://github.com/kuopinghsu/callgraph-gen/blob/master/release/graphgen.win64.tar.bz2"> here </A>
-- macOS Catalina application <A Href="https://github.com/kuopinghsu/callgraph-gen/blob/master/release/graphgen.macos.tar.bz2"> here </A>
+## Binary Released
+- Windows 64-bit application <A Href="https://github.com/kuopinghsu/callgraph-gen/blob/master/release/graphgen.win64.tar.bz2">here</A>
+- macOS Catalina application <A Href="https://github.com/kuopinghsu/callgraph-gen/blob/master/release/graphgen.macos.tar.bz2">here</A>
 
-# Getting Started
+## Getting Started
 It requires following library to build the code.
 
-- uthash: hash library https://troydhanson.github.io/uthash/userguide.html
+  - uthash: hash library <https://troydhanson.github.io/uthash/userguide.html>
 
-- PCRE: Perl Compatible Regular Expressions https://www.pcre.org/
+  - PCRE: Perl Compatible Regular Expressions <https://www.pcre.org>
 
 Install the PCRE library and libxml2 directory. Or insatall libpcre2-dev and libxml2-dev package on Ubuntu.
 
@@ -31,14 +31,14 @@ build
 $ make
 ```
 
-# Features
+## Features
 
-- Generate call graph
-- Generate call tree
-- Recursive detection
-- Calculate the stack usage
+  - Generate call graph
+  - Generate call tree
+  - Recursive detection
+  - Calculate the stack usage
 
-# Usage
+## Usage
 ```
 Generate call graph of a elf binary file. Apr 18 2020 build
 
@@ -80,6 +80,7 @@ This is an example to show the call tree of RISC-V's dhrystone diag. Using binut
 ```
 $ riscv64-unknown-elf-objdump -d dhrystone.riscv > dhrystone.s
 ```
+
 Generate the Call-Graph of VCG file
 
 ```
@@ -104,10 +105,9 @@ Recomment use <A Href="https://pp.ipd.kit.edu/firm/yComp.html">yComp</A> to brow
 
 <img src="https://github.com/kuopinghsu/callgraph/blob/master/images/yComp.png" alt="yComp">
 
-# Limitations
+## Limitations
 
-- Generating the call stack for ARM (experimental)
+  - Generating the call stack for ARM (experimental)
 
-# License
+## License
 MIT license
-
