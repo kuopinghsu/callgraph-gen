@@ -2,7 +2,7 @@
 Generating the call graph from elf binary file
 
 # Binary Released
-- Windows 32-bit application <A Href="https://github.com/kuopinghsu/callgraph-gen/blob/master/release/graphgen.exe.7z"> here </A>
+- Windows 64-bit application <A Href="https://github.com/kuopinghsu/callgraph-gen/blob/master/release/graphgen.win64.tar.bz2"> here </A>
 - macOS Catalina application <A Href="https://github.com/kuopinghsu/callgraph-gen/blob/master/release/graphgen.macos.tar.bz2"> here </A>
 
 # Getting Started

@@ -5,8 +5,9 @@ ifneq (, $(findstring linux, $(SYS)))
 CFLAGS   = -I/usr/include/libxml2 -Wformat-truncation=0 -Wno-stringop-truncation
 LDFLAGS  =
 else ifneq (, $(findstring mingw, $(SYS)))
-CFLAGS   = -I/mingw64/include/libxml2 -L/mingw64/lib
-LDFLAGS  =
+CFLAGS   = -I/mingw64/include/libxml2 -Wformat-truncation=0 -Wno-stringop-truncation
+LDFLAGS  = -L/mingw64/lib
+LDFLAGS  = 
 else ifneq (, $(findstring cygwin, $(SYS)))
 CFLAGS   =
 LDFLAGS  =
