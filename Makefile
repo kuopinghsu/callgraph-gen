@@ -4,7 +4,7 @@ SYS     := $(shell gcc -dumpmachine)
 ifneq (, $(findstring linux, $(SYS)))
 CFLAGS   = -I/usr/include/libxml2 -Wformat-truncation=0 -Wno-stringop-truncation
 LDFLAGS  =
-else ifneq (, $(findstring msys, $(SYS)))
+else ifneq (, $(findstring mingw, $(SYS)))
 CFLAGS   = -I/mingw64/include/libxml2 -Wformat-truncation=0 -Wno-stringop-truncation
 LDFLAGS  = -L/mingw64/lib
 else ifneq (, $(findstring cygwin, $(SYS)))
