@@ -43,8 +43,6 @@ char regmap[MAXREG][MAXSIZE];
 // xml file
 char xmlfile[MAXSIZE] = "";
 
-#define strncpy_s(dst, src, n) strncpy(dst, src, n); dst[n] = 0;
-
 #define getop(dst, src, ovector, n) snprintf(dst, MAXSIZE, "%.*s", (int)(ovector[2*(n)+1] - ovector[2*(n)]), (src + ovector[2*(n)]))
 
 typedef struct _LIST {
@@ -99,6 +97,13 @@ STRING *ignore = NULL;          // ignore node
 
 extern char default_xml[];
 extern int default_xml_len;
+
+char *strncpy_s(char *dest, const char *src, size_t n) {
+    int len = strnlen(src, n);
+    memcpy(dest, src, len);
+    dest[len] = 0;
+    return dest;
+}
 
 void usage(void) {
     int i;
