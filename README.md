@@ -1,4 +1,7 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/8852412d15834d758ec5bd08f90db132)](https://www.codacy.com/manual/kuopinghsu/callgraph-gen?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=kuopinghsu/callgraph-gen&amp;utm_campaign=Badge_Grade)
+
 # Callgraph Generator
+
 Generating the call graph from elf binary file
 
 ## Binary Released
