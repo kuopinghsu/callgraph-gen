@@ -66,7 +66,7 @@ parse_xml_array (char *buf, int len)
             if (VERBOSE) printf ("this is %s: %s\n", (char *) name, (char *) value); //get value, CDATA is not parse and don't take into value
 
             target++;
-            if ((str = malloc(strlen((char*) value)+1)) == NULL) {
+            if ((str = malloc(strnlen((char*) value, MAXSTRLEN)+1)) == NULL) {
                 fprintf(stderr, "malloc fail\n");
                 return -1;
             }
@@ -84,13 +84,13 @@ parse_xml_array (char *buf, int len)
                     name = xmlGetProp (detail, BAD_CAST "name");
                     value = xmlNodeGetContent (detail);
 
-                    if (strlen ((char *) value) != 0) {
+                    if (strnlen ((char *) value, MAXSTRLEN) != 0) {
                         if (VERBOSE) printf ("%s : %s\n", (char *) name, (char *) value);
                     } else {
                         if (VERBOSE) printf ("%s has no value\n", (char *) name);
                     }
 
-                    if ((str = malloc(strlen((char*) value)+1)) == NULL) {
+                    if ((str = malloc(strnlen((char*) value, MAXSTRLEN)+1)) == NULL) {
                         fprintf(stderr, "malloc fail\n");
                         return -1;
                     }
@@ -148,6 +148,8 @@ xmlparse (char *xmlfile)
 
     if (fread (content, 1, filesize, file) != filesize) {
         fprintf (stderr, "file %s read failed", xmlfile);
+        fclose(file);
+        free(content);
         return 0;
     }
 

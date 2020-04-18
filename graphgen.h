@@ -4,6 +4,8 @@
 #ifndef __GRAPHGEN_H__
 #define __GRAPHGEN_H__
 
+#define MAXSTRLEN 1024
+
 typedef struct _ARCH {
     char *name;
     int   multiline;
