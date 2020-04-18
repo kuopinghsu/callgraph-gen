@@ -3,14 +3,15 @@ Generating the call graph from elf binary file
 
 ## Binary Released
 
-  * Windows 64-bit application <A Href="https://github.com/kuopinghsu/callgraph-gen/blob/master/release/graphgen.win64.tar.bz2">here</A>
-  * macOS Catalina application <A Href="https://github.com/kuopinghsu/callgraph-gen/blob/master/release/graphgen.macos.tar.bz2">here</A>
+*   Windows 64-bit application <A Href="https://github.com/kuopinghsu/callgraph-gen/blob/master/release/graphgen.win64.tar.bz2">here</A>
+*   macOS Catalina application <A Href="https://github.com/kuopinghsu/callgraph-gen/blob/master/release/graphgen.macos.tar.bz2">here</A>
 
 ## Getting Started
+
 It requires following library to build the code.
 
-  * uthash: hash library <https://troydhanson.github.io/uthash/userguide.html>
-  * PCRE: Perl Compatible Regular Expressions <https://www.pcre.org>
+*   uthash: hash library <https://troydhanson.github.io/uthash/userguide.html>
+*   PCRE: Perl Compatible Regular Expressions <https://www.pcre.org>
 
 Install the PCRE library and libxml2 directory. Or insatall libpcre2-dev and libxml2-dev package on Ubuntu.
 
@@ -33,10 +34,10 @@ $ make
 
 ## Features
 
-  * Generate call graph
-  * Generate call tree
-  * Recursive detection
-  * Calculate the stack usage
+*   Generate call graph
+*   Generate call tree
+*   Recursive detection
+*   Calculate the stack usage
 
 ## Usage
 ```text
@@ -107,7 +108,7 @@ Recomment use <A Href="https://pp.ipd.kit.edu/firm/yComp.html">yComp</A> to brow
 
 ## Limitations
 
-  * Generating the call stack for ARM (experimental)
+*   Generating the call stack for ARM (experimental)
 
 ## License
 MIT license
