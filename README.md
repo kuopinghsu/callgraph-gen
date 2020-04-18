@@ -2,44 +2,43 @@
 Generating the call graph from elf binary file
 
 ## Binary Released
-- Windows 64-bit application <A Href="https://github.com/kuopinghsu/callgraph-gen/blob/master/release/graphgen.win64.tar.bz2">here</A>
-- macOS Catalina application <A Href="https://github.com/kuopinghsu/callgraph-gen/blob/master/release/graphgen.macos.tar.bz2">here</A>
+  - Windows 64-bit application <A Href="https://github.com/kuopinghsu/callgraph-gen/blob/master/release/graphgen.win64.tar.bz2">here</A>
+  - macOS Catalina application <A Href="https://github.com/kuopinghsu/callgraph-gen/blob/master/release/graphgen.macos.tar.bz2">here</A>
 
 ## Getting Started
 It requires following library to build the code.
 
-  - uthash: hash library <https://troydhanson.github.io/uthash/userguide.html>
-
-  - PCRE: Perl Compatible Regular Expressions <https://www.pcre.org>
+- uthash: hash library <https://troydhanson.github.io/uthash/userguide.html>
+- PCRE: Perl Compatible Regular Expressions <https://www.pcre.org>
 
 Install the PCRE library and libxml2 directory. Or insatall libpcre2-dev and libxml2-dev package on Ubuntu.
 
-```
+```text
 $ sudo apt install libpcre2-dev libxml2-dev
 ```
 
 Checkout the repository and initialize all submodules
 
-```
+```text
 $ git clone https://github.com/kuopinghsu/callgraph.git
 $ git submodule update --init --recursive
 ```
 
 build
 
-```
+```text
 $ make
 ```
 
 ## Features
 
-  - Generate call graph
-  - Generate call tree
-  - Recursive detection
-  - Calculate the stack usage
+- Generate call graph
+- Generate call tree
+- Recursive detection
+- Calculate the stack usage
 
 ## Usage
-```
+```text
 Generate call graph of a elf binary file. Apr 18 2020 build
 
 Usage:
@@ -77,13 +76,13 @@ Example:
 
 This is an example to show the call tree of RISC-V's dhrystone diag. Using binutils to generate the assembly file
 
-```
+```text
 $ riscv64-unknown-elf-objdump -d dhrystone.riscv > dhrystone.s
 ```
 
 Generate the Call-Graph of VCG file
 
-```
+```text
 $ graphgen --target riscv --graph dhrystone.s dhrystone.vcg
 ```
 
@@ -92,7 +91,7 @@ This is an example of call graph of RISC-V's dhrystone.<br>
 
 Generate the Call-Tree of VCG file
 
-```
+```text
 $ graphgen --target riscv --tree dhrystone.s dhrystone.vcg
 ```
 
@@ -107,7 +106,7 @@ Recomment use <A Href="https://pp.ipd.kit.edu/firm/yComp.html">yComp</A> to brow
 
 ## Limitations
 
-  - Generating the call stack for ARM (experimental)
+- Generating the call stack for ARM (experimental)
 
 ## License
 MIT license
