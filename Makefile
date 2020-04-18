@@ -9,7 +9,7 @@ CFLAGS   = -I/mingw64/include/libxml2 -Wformat-truncation=0 -Wno-stringop-trunca
 LDFLAGS  = -L/mingw64/lib
 LDFLAGS  = 
 else ifneq (, $(findstring cygwin, $(SYS)))
-CFLAGS   =
+CFLAGS   = -I/usr/include/libxml2 -Wformat-truncation=0 -Wno-stringop-truncation
 LDFLAGS  =
 else ifneq (, $(findstring darwin, $(SYS)))
 CFLAGS   = -I/usr/local/opt/libxml2/include/libxml2
