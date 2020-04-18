@@ -15,6 +15,7 @@ It requires following library to build the code.
 
 *   uthash: hash library <https://troydhanson.github.io/uthash/userguide.html>
 *   PCRE: Perl Compatible Regular Expressions <https://www.pcre.org>
+*   libxml2: <http://xmlsoft.org>
 
 Install the PCRE library and libxml2 directory. Or insatall libpcre2-dev and libxml2-dev package on Ubuntu.
 
