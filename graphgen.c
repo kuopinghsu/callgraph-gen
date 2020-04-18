@@ -991,7 +991,7 @@ void gen_graph_vcg(char *filename, int only_linked) {
         char stack[MAXSIZE] = "";
         char frame[MAXSIZE] = "";
 
-        if (VERBOSE) printf("%s: callee addr 0x%08x, prog size: %d, stack size: %d\n", s->name, s->pc, s->prog_size, s->stack_size);
+        if (VERBOSE) printf("%s: callee addr 0x%08x, prog size: %u, stack size: %u\n", s->name, s->pc, s->prog_size, s->stack_size);
 
         if (only_linked && !s->traversed)
             continue;
