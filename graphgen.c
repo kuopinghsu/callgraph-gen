@@ -150,8 +150,8 @@ char * trim(char * s) {
     static char str[MAXSIZE];
     int l = strlen(s);
 
-    while(isspace(s[l - 1])) --l;
-    while(* s && isspace(* s)) { ++s, --l; }
+    while(isspace((int)s[l - 1])) --l;
+    while(* s && isspace((int)* s)) { ++s, --l; }
 
     strncpy(str, s, l-1);
     str[l] = 0;
