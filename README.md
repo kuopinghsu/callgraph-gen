@@ -69,9 +69,9 @@ Example:
     maximun tree depth is 10, generate a call tree, ignode function abort, and
     exit.
 
-    $ graphgen --xml contrib/xtensa.xml --tree --root printf infile.s outfile.vcg
+    $ graphgen --xml contrib/xtensa.xml --tree --root init infile.s outfile.vcg
 
-    Use a user-defined processor to generate a call tree from printf function.
+    Use a user-defined processor to generate a call tree from init() function.
 
 ```
 

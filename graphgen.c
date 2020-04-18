@@ -137,9 +137,9 @@ void usage(void) {
 "    maximun tree depth is 10, generate a call tree, ignode function abort, and\n"
 "    exit.\n"
 "\n"
-"    $ graphgen --xml contrib/xtensa.xml --tree --root printf infile.s outfile.vcg\n"
+"    $ graphgen --xml contrib/xtensa.xml --tree --root init infile.s outfile.vcg\n"
 "\n"
-"    Use a user-defined processor to generate a call tree from printf function.\n"
+"    Use a user-defined processor to generate a call tree from init() function.\n"
 "\n"
 );
 
