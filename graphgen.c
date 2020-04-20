@@ -99,6 +99,7 @@ STRING *ignore = NULL;          // ignore node
 extern char default_xml[];
 extern int default_xml_len;
 
+#define strncpy_s __strncpy_s
 char *strncpy_s(char *dest, const char *src, size_t n) {
     int len = strnlen(src, n);
     memcpy(dest, src, len);
