@@ -268,8 +268,7 @@ int preparsing(char *filename) {
     pcre2_code *re = NULL;
     pcre2_match_data *match_data = NULL;
     char line[MAXSIZE];
-    int i, linecnt;
-    int matched, maxcnt;
+    int i, maxcnt;
     int target_cur;
 
     if ((fp = fopen(filename, "r")) == NULL) {
@@ -280,8 +279,8 @@ int preparsing(char *filename) {
     maxcnt = 0;
     target_cur = 0;
     for(i = 0; i < sizeof_arch; i++) {
-        linecnt = 0;
-        matched = 0;
+        int linecnt = 0;
+        int matched = 0;
         target = i;
     	while(!feof(fp) && fgets(line, sizeof(line), fp)) {
        	    PCRE2_SIZE* ovector = NULL;
