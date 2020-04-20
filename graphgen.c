@@ -17,13 +17,14 @@
 #include "uthash.h"
 #include "graphgen.h"
 
-#define MAXSIZE MAXSTRLEN
-#define MAXREG  64
-#define MAXCHILD 2048
-#define DEFAULT_MAXDEPTH 256
+#define MAXSIZE             MAXSTRLEN
+#define MAXREG              64
+#define MAXCHILD            2048
+#define MAXLINE             4096
+#define DEFAULT_MAXDEPTH    256
 
 int MAXDEPTH = DEFAULT_MAXDEPTH;
-int VERBOSE = 1;
+int VERBOSE = 0;
 int tree = 0;
 int vcg = 1;
 int frame_pointer = 0;
@@ -130,11 +131,7 @@ void usage(void) {
 
     printf("Support target:\n");
     for(i=0; i<sizeof_arch; i++) {
-        if (i == 0) {
-            printf("    %s (default)\n", _arch[i].name);
-        } else {
-            printf("    %s\n", _arch[i].name);
-        }
+        printf("    %s\n", _arch[i].name);
     }
 
     printf(
@@ -264,6 +261,115 @@ PCRE2_SIZE* regex(pcre2_code *re,
     ovector = pcre2_get_ovector_pointer(match_data);
 
     return rc < 0 ? NULL : ovector;
+}
+
+int preparsing(char *filename) {
+    FILE *fp;
+    pcre2_code *re = NULL;
+    pcre2_match_data *match_data = NULL;
+    char line[MAXSIZE];
+    int i, linecnt;
+    int matched, maxcnt;
+    int target_cur;
+
+    if ((fp = fopen(filename, "r")) == NULL) {
+        fprintf(stderr, "Can not open file %s\n", filename);
+        return -1;
+    }
+
+    maxcnt = 0;
+    target_cur = 0;
+    for(i = 0; i < sizeof_arch; i++) {
+        linecnt = 0;
+        matched = 0;
+        target = i;
+    	while(!feof(fp) && fgets(line, sizeof(line), fp)) {
+       	    PCRE2_SIZE* ovector = NULL;
+
+            if (linecnt++ > MAXLINE)
+                break;
+
+            // Cross the section
+            ovector = regex(re, match_data, (PCRE2_SPTR8)line, (PCRE2_SPTR8)
+                      "Disassembly of section.+");
+            if (ovector != NULL) {
+                continue;
+            }
+
+            // function name declare
+            ovector = regex(re, match_data, (PCRE2_SPTR8)line, (PCRE2_SPTR8)
+                      ITEM_FUNC);
+            if (ovector != NULL) {
+                matched++;
+                continue;
+            }
+
+            // get stack size
+            if (ITEM_STACK[0] != 0) {
+                ovector = regex(re, match_data, (PCRE2_SPTR8)line, (PCRE2_SPTR8)
+                      ITEM_STACK);
+
+                if (ovector != NULL) {
+                    matched++;
+                    if (!MULTILINE) continue;
+                }
+            }
+
+            // get stack size
+            if (ITEM_PUSH[0] != 0) {
+                ovector = regex(re, match_data, (PCRE2_SPTR8)line, (PCRE2_SPTR8)
+                      ITEM_PUSH);
+
+                if (ovector != NULL) {
+                    matched++;
+                    if (!MULTILINE) continue;
+                }
+            }
+
+            // get loadr
+            if (ITEM_LOADR[0] != 0) {
+                ovector = regex(re, match_data, (PCRE2_SPTR8)line, (PCRE2_SPTR8)
+                      ITEM_LOADR);
+
+                if (ovector != NULL) {
+                    matched++;
+                    if (!MULTILINE) continue;
+                }
+            }
+
+            // function call
+            ovector = regex(re, match_data, (PCRE2_SPTR8)line, (PCRE2_SPTR8)
+                      ITEM_CALL);
+            if (ovector != NULL) {
+                matched++;
+                if (!MULTILINE) continue;
+            }
+
+            // indirect function call
+            ovector = regex(re, match_data, (PCRE2_SPTR8)line, (PCRE2_SPTR8)
+                      ITEM_CALLR);
+            if (ovector != NULL) {
+                matched++;
+                if (!MULTILINE) continue;
+            }
+        }
+
+        if (matched > maxcnt) {
+            maxcnt = matched;
+            target_cur = i;
+        }
+
+        if (VERBOSE)
+            printf("%s %d patterns match\n", _arch[i].name, matched);
+
+        rewind(fp);
+    }
+
+    pcre2_match_data_free(match_data);   /* Release memory used for the match */
+    pcre2_code_free(re);                 /* data and the compiled pattern. */
+    fclose(fp);
+
+    return target_cur;
 }
 
 int create_graph(char *filename) {
@@ -1142,6 +1248,7 @@ int main(int argc, char **argv) {
     int i;
     char infile[MAXSIZE];
     char outfile[MAXSIZE];
+    int automatic = 1;
 
     const char *optstring = "a:x:vm:gtr:i:hcdk";
     int c;
@@ -1161,17 +1268,15 @@ int main(int argc, char **argv) {
        {0, 0, 0, 0}
     };
 
-    if (argc <= 2) {
-        usage();
-        return 1;
-    }
-
-    #ifndef __PREDEFINED_ARRAY__
     if (parse_xml_array (default_xml, default_xml_len) < 0) {
         fprintf (stderr, "parse default xml failed\n");
         return 1;
     }
-    #endif
+
+    if (argc <= 2) {
+        usage();
+        return 1;
+    }
 
     while((c = getopt_long(argc, argv, optstring, opts, NULL)) != -1) {
         switch(c) {
@@ -1186,6 +1291,7 @@ int main(int argc, char **argv) {
                 } else {
                     target = i;
                 }
+                automatic = 0;
                 break;
             case 'x':
                 strncpy_s(xmlfile, optarg, sizeof(xmlfile)-1);
@@ -1238,6 +1344,14 @@ int main(int argc, char **argv) {
 
     strncpy_s(infile, argv[optind], sizeof(infile)-1);
     strncpy_s(outfile, argv[optind+1], sizeof(outfile)-1);
+
+    if (automatic) {
+        int result;
+        result = preparsing(infile);
+        if (result < 0) return 1;
+        target = result;
+        printf("Parsing target '%s'\n", ITEM_NAME);
+    }
 
     generate_ignore();
     create_graph(infile);

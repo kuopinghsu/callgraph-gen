@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root name="root">
     <content>
-        <ncore id="ncore">3</ncore>
+        <ncore id="ncore">4</ncore>
 
         <core id="name">riscv</core>
         <details>
@@ -34,6 +34,17 @@
             <detail name="call"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+(l\.jal)\s+[0-9A-Fa-f]+\s+<(.+)>]]></detail>
             <detail name="callx"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+(l\.jalr)\s+(\S+)]]></detail>
             <detail name="multiline">0</detail>
+	</details>
+
+        <core id="name">xtensa</core>
+        <details>
+            <detail name="func"><![CDATA[^([0-9A-Fa-f]+)\s+<([^\+^\-]+)>:]]></detail>
+            <detail name="stack"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+entry\s+\S+,\s+([0-9a-fA-FxX]+)]]></detail>
+            <detail name="push"/>
+            <detail name="loader"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+l32r\s+a(\d+).+<(.+)>]]></detail>
+            <detail name="call"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+(call[048])\s+[0-9A-Fa-f]+\s+<(.+)>]]></detail>
+            <detail name="callx"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+(callx[048])\s+a(\d+)]]></detail>
+            <detail name="multiline">1</detail>
         </details>
     </content>
 </root>

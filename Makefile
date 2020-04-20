@@ -15,7 +15,7 @@ CFLAGS   = -I/usr/local/opt/libxml2/include/libxml2
 LDFLAGS  = -L/usr/local/opt/libxml2/lib
 endif
 
-CFLAGS  += -g -O3 -Wall #-D__PREDEFINED_ARRAY__
+CFLAGS  += -g -O3 -Wall
 CFLAGS  += -I./uthash/include
 LDFLAGS += -lpcre2-8 -lxml2
 OBJECTS  = graphgen.o xmlparser.o default_xml.o

@@ -45,7 +45,7 @@ $ make
 
 ## Usage
 ```text
-Generate call graph of a elf binary file. Apr 18 2020 build
+Generate call graph of a elf binary file. Apr 19 2020 build
 
 Usage:
     graphgen [-v] [-a target] [-x file] [-r function_name] [-m n]
@@ -66,6 +66,10 @@ Usage:
     --help, -h              help
 
 Support target:
+    riscv
+    arm
+    openrisc
+    xtensa
 
 Example:
 
