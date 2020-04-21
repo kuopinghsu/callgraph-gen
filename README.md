@@ -45,7 +45,7 @@ $ make
 
 ## Usage
 ```text
-Generate call graph of a elf binary file. Apr 19 2020 build
+Generate call graph of a elf binary file. Apr 21 2020 build
 
 Usage:
     graphgen [-v] [-a target] [-x file] [-r function_name] [-m n]
@@ -75,12 +75,13 @@ Example:
 
     $ graphgen --max 10 --tree --ignore abort,exit infile.s outfile.vcg
 
-    maximun tree depth is 10, generate a call tree, ignode function abort, and
-    exit.
+      maximun tree depth is 10, generate a call tree, ignode function abort,
+      and exit.
 
-    $ graphgen --xml contrib/xtensa.xml --tree --root init infile.s outfile.vcg
+    $ graphgen --xml mycore.xml --tree --root init infile.s outfile.vcg
 
-    Use a user-defined processor to generate a call tree from init() function.
+      Use a user-defined processor to generate a call tree from init()
+      function.
 
 ```
 

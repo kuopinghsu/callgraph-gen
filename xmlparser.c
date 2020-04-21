@@ -20,7 +20,7 @@ parse_xml_array (char *buf, int len)
     doc = xmlParseMemory (buf, len);    //parse xml in memory
 
     if (doc == NULL) {
-        if (VERBOSE) printf ("doc == null\n");
+        if (VERBOSE > 1) printf ("doc == null\n");
         return -1;
     }
 
@@ -32,7 +32,7 @@ parse_xml_array (char *buf, int len)
     }
 
     if (node == NULL) {
-        if (VERBOSE) printf ("no node = content\n");
+        if (VERBOSE > 1) printf ("no node = content\n");
         return -1;
     }
 
@@ -41,7 +41,9 @@ parse_xml_array (char *buf, int len)
             name = xmlGetProp (node, BAD_CAST "id");
             value = xmlNodeGetContent (node);
 
-            if (VERBOSE) printf ("this is %s: %s\n", (char *) name, (char *) value); //get value, CDATA is not parse and don't take into value
+            //get value, CDATA is not parse and don't take into value
+            if (VERBOSE > 1)
+                printf ("this is %s: %s\n", (char *) name, (char *) value);
 
             sizeof_arch = atoi((char*) value);
 
@@ -63,7 +65,9 @@ parse_xml_array (char *buf, int len)
             name = xmlGetProp (node, BAD_CAST "id");
             value = xmlNodeGetContent (node);
 
-            if (VERBOSE) printf ("this is %s: %s\n", (char *) name, (char *) value); //get value, CDATA is not parse and don't take into value
+            //get value, CDATA is not parse and don't take into value
+            if (VERBOSE > 1)
+                printf ("this is %s: %s\n", (char *) name, (char *) value);
 
             target++;
             if ((str = malloc(strnlen((char*) value, MAXSTRLEN)+1)) == NULL) {
@@ -71,7 +75,7 @@ parse_xml_array (char *buf, int len)
                 return -1;
             }
 
-            strcpy(str, (char*)value);
+            strncpy_s(str, (char*)value, MAXSTRLEN-1);
             ITEM_NAME = str;
 
             xmlFree (name);
@@ -85,9 +89,9 @@ parse_xml_array (char *buf, int len)
                     value = xmlNodeGetContent (detail);
 
                     if (strnlen ((char *) value, MAXSTRLEN) != 0) {
-                        if (VERBOSE) printf ("%s : %s\n", (char *) name, (char *) value);
+                        if (VERBOSE > 1) printf ("%s : %s\n", (char *) name, (char *) value);
                     } else {
-                        if (VERBOSE) printf ("%s has no value\n", (char *) name);
+                        if (VERBOSE > 1) printf ("%s has no value\n", (char *) name);
                     }
 
                     if ((str = malloc(strnlen((char*) value, MAXSTRLEN)+1)) == NULL) {
@@ -95,7 +99,7 @@ parse_xml_array (char *buf, int len)
                         return -1;
                     }
 
-                    strcpy(str, (char*)value);
+                    strncpy_s(str, (char*)value, MAXSTRLEN-1);
 
                     if (!strcmp((char*)name, "func")) {
                         ITEM_FUNC = str;
