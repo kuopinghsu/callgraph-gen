@@ -46,6 +46,7 @@ $ make
 ## Usage
 ```text
 Generate call graph of a elf binary file. Apr 21 2020 build
+Written by Kuoping Hsu, MIT license
 
 Usage:
     graphgen [-v] [-a target] [-x file] [-r function_name] [-m n]
