@@ -120,7 +120,8 @@ void usage(void) {
     int i;
 
     printf(
-"Generate call graph of a elf binary file. " __DATE__ " build\n\n"
+"Generate call graph of a elf binary file. " __DATE__ " build\n"
+"Written by Kuoping Hsu, MIT license\n\n"
 "Usage:\n"
 "    graphgen [-v] [-a target] [-x file] [-r function_name] [-m n]\n"
 "             [-g | -t] [-c | -d] [-r name] [-i list] [-h]\n"
