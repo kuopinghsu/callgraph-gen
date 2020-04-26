@@ -1,6 +1,8 @@
 CC       = gcc
 SYS     := $(shell gcc -dumpmachine)
 
+XMLFILE  = contrib/default.xml
+
 ifneq (, $(findstring linux, $(SYS)))
 CFLAGS   = -I/usr/include/libxml2 -Wformat-truncation=0 -Wno-stringop-truncation
 LDFLAGS  =
@@ -18,22 +20,21 @@ endif
 CFLAGS  += -g -O3 -Wall
 CFLAGS  += -I./uthash/include
 LDFLAGS += -lpcre2-8 -lxml2
-OBJECTS  = graphgen.o xmlparser.o default_xml.o
+OBJECTS  = graphgen.o xmlparser.o
 EXEFILE  = graphgen
 
 all: $(EXEFILE)
 
 .SUFFIXES: .c .h .o
-%.o: %.c %.h Makefile default_xml.c
+%.o: %.c %.h Makefile default_xml.h
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 $(EXEFILE): $(OBJECTS)
 	$(CC) -o $(EXEFILE) $(OBJECTS) $(LDFLAGS)
 
-default_xml.c: contrib/default.xml
-	@cp contrib/default.xml default_xml
-	@xxd -i default_xml $@ && $(RM) default_xml
+default_xml.h: $(XMLFILE)
+	@cat $(XMLFILE) | xxd -i > default_xml.h
 
 clean:
-	-rm $(EXEFILE) $(OBJECTS) default_xml.c
+	-rm $(EXEFILE) $(OBJECTS) default_xml.h
 

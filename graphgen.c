@@ -23,6 +23,10 @@
 #define MAXLINE             4096
 #define DEFAULT_MAXDEPTH    256
 
+char default_xml[] = {
+#include "default_xml.h"
+};
+
 int MAXDEPTH = DEFAULT_MAXDEPTH;
 int VERBOSE = 0;
 int tree = 0;
@@ -105,9 +109,6 @@ ROOT   *root = NULL;            // root node
 TNODE  *tnode = NULL;           // tag node
 STRING *ignore = NULL;          // ignore node
 RNODE  *rnode = NULL;           // recursive node
-
-extern char default_xml[];
-extern int default_xml_len;
 
 char *strncpy_s(char *dest, const char *src, size_t n) {
     int len = strnlen(src, n);
@@ -1365,7 +1366,7 @@ int main(int argc, char **argv) {
        {0, 0, 0, 0}
     };
 
-    if (parse_xml_array (default_xml, default_xml_len) < 0) {
+    if (parse_xml_array (default_xml, sizeof(default_xml)) < 0) {
         fprintf (stderr, "parse default xml failed\n");
         return 1;
     }
