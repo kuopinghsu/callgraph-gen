@@ -36,6 +36,26 @@ build
 $ make
 ```
 
+build on Visual Studio 2019
+
+```text
+% mkdir {somewhere} && cd {somewhere}
+% git clone https://github.com/kiyolee/libxml2-win-build.git
+% git clone https://github.com/kiyolee/pcre-win-build.git
+% git clone --recursive https://github.com/kuopinghsu/callgraph.git
+```
+
+Modify the file ./libxml2-win-build/include/libxml/xmlversion.h, keep
+the following and delete all other LIBXML_xxxx_ENABLED settings.
+
+```text
+LIBXML_THREAD_ENABLED
+LIBXML_READER_ENABLED
+LIBXML_SAX1_ENABLED
+```
+
+Build libxml2-static and libpcre2-8-static, and then build callgraph.
+
 ## Features
 
 *   Generate call graph

@@ -4,6 +4,15 @@
 #ifndef __GRAPHGEN_H__
 #define __GRAPHGEN_H__
 
+#define _CRT_SECURE_NO_WARNINGS 1
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
+#include <ctype.h>
+#include <stdint.h>
+
 #define MAXSTRLEN 1024
 
 typedef struct _ARCH {

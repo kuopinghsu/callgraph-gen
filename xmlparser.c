@@ -1,12 +1,12 @@
 // I forgot where I got this sample code. I made minor changes.
 // If anyone knows the source of the code, please let me know.
 // I will add notes on this source code.
-#include<stdio.h>
-#include<string.h>
-#include<libxml/parser.h>
-#include<libxml/tree.h>
 
 #include "graphgen.h"
+
+#include <libxml/parser.h>
+#include <libxml/tree.h>
+
 extern int VERBOSE;
 
 int

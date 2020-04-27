@@ -1,21 +1,16 @@
 // Written by Kuo-Ping Hsu
 // Required library: pcre, uthash
 // MIT license
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-#include <ctype.h>
-#include <unistd.h>
+
+#define __DEF_ARRAY__
+#include "graphgen.h"
 #include <getopt.h>
 
 #define PCRE2_STATIC
 #define PCRE2_CODE_UNIT_WIDTH 8
 #include <pcre2.h>
 
-#define __DEF_ARRAY__
 #include "uthash.h"
-#include "graphgen.h"
 
 #define MAXSIZE             MAXSTRLEN
 #define MAXREG              64
