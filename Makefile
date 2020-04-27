@@ -26,15 +26,15 @@ EXEFILE  = graphgen
 all: $(EXEFILE)
 
 .SUFFIXES: .c .h .o
-%.o: %.c %.h Makefile default_xml.h
+%.o: %.c %.h Makefile default_xml.inc
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 $(EXEFILE): $(OBJECTS)
 	$(CC) -o $(EXEFILE) $(OBJECTS) $(LDFLAGS)
 
-default_xml.h: $(XMLFILE)
-	@cat $(XMLFILE) | xxd -i > default_xml.h
+default_xml.inc: $(XMLFILE)
+	@cat $(XMLFILE) | xxd -i > default_xml.inc
 
 clean:
-	-rm $(EXEFILE) $(OBJECTS) default_xml.h
+	-rm $(EXEFILE) $(OBJECTS) default_xml.inc
 

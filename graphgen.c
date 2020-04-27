@@ -19,7 +19,7 @@
 #define DEFAULT_MAXDEPTH    256
 
 char default_xml[] = {
-#include "default_xml.h"
+#include "default_xml.inc"
 };
 
 int MAXDEPTH = DEFAULT_MAXDEPTH;
