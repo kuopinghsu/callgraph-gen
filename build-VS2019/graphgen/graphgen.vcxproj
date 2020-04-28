@@ -31,8 +31,9 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{1E9484C2-D215-4CB8-ACCA-697C3C4C4BD5}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>callgraph</RootNamespace>
+    <RootNamespace>graphgen</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>graphgen</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

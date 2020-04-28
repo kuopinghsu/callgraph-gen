@@ -22,10 +22,10 @@
     <ClInclude Include="..\..\graphgen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="default_xml.h">
+    <ClInclude Include="getopt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="getopt.h">
+    <ClInclude Include="..\..\default_xml.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

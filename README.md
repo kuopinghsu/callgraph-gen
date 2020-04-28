@@ -65,16 +65,17 @@ Build libxml2-static and libpcre2-8-static, and then build callgraph.
 
 ## Usage
 ```text
-Generate call graph of a elf binary file. Apr 21 2020 build
+Generate call graph of a elf binary file. Apr 28 2020 build
 Written by Kuoping Hsu, MIT license
 
 Usage:
     graphgen [-v] [-a target] [-x file] [-r function_name] [-m n]
              [-g | -t] [-c | -d] [-r name] [-i list] [-h]
-             asm_file vcg_file
+             asm_file [vcg_file]
 
     --verbose, -v           verbose output
-    --target name, -a name  specify the target (see support target below)
+    --target name, -a name  specify the target (see support target
+                            below)
     --xml file, -x file     read config file
     --root func, -r func    specify the root function
     --max n, -m n           max depth (default 256)
@@ -91,18 +92,19 @@ Support target:
     arm
     openrisc
     xtensa
+    xtensa_call0
 
 Example:
 
-    $ graphgen --max 10 --tree --ignore abort,exit infile.s outfile.vcg
+    $ graphgen --max 10 --tree --ignore abort,exit infile.s
 
-      maximun tree depth is 10, generate a call tree, ignode function abort,
-      and exit.
+      maximun tree depth is 10, generate a call tree, ignode function
+      abort, and exit.
 
-    $ graphgen --xml mycore.xml --tree --root init infile.s outfile.vcg
+    $ graphgen --xml mycore.xml --tree --root init infile.s
 
-      Use a user-defined processor to generate a call tree from init()
-      function.
+      Use a user-defined processor to generate a call tree from
+      init() function.
 
 ```
 

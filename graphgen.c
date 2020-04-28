@@ -112,6 +112,17 @@ char *strncpy_s(char *dest, const char *src, size_t n) {
     return dest;
 }
 
+char *strncat_s(char *dest, size_t dest_n, const char *src, size_t count) {
+    int len = (int)strnlen(dest, dest_n);
+    int src_len = 0;
+    if (len < count) {
+        src_len = (int)strnlen(src, count-len);
+        memcpy(&dest[len], src, src_len);
+    }
+    dest[len+src_len] = 0;
+    return dest;
+}
+
 void usage(void) {
     int i;
 
@@ -121,9 +132,10 @@ void usage(void) {
 "Usage:\n"
 "    graphgen [-v] [-a target] [-x file] [-r function_name] [-m n]\n"
 "             [-g | -t] [-c | -d] [-r name] [-i list] [-h]\n"
-"             asm_file vcg_file\n\n"
+"             asm_file [vcg_file]\n\n"
 "    --verbose, -v           verbose output\n"
-"    --target name, -a name  specify the target (see support target below)\n"
+"    --target name, -a name  specify the target (see support target\n"
+"                            below)\n"
 "    --xml file, -x file     read config file\n"
 "    --root func, -r func    specify the root function\n"
 "    --max n, -m n           max depth (default 256)\n"
@@ -143,15 +155,15 @@ void usage(void) {
 
     printf(
 "\nExample:\n\n"
-"    $ graphgen --max 10 --tree --ignore abort,exit infile.s outfile.vcg\n"
+"    $ graphgen --max 10 --tree --ignore abort,exit infile.s\n"
 "\n"
-"      maximun tree depth is 10, generate a call tree, ignode function abort,\n"
-"      and exit.\n"
+"      maximun tree depth is 10, generate a call tree, ignode function\n"
+"      abort, and exit.\n"
 "\n"
-"    $ graphgen --xml mycore.xml --tree --root init infile.s outfile.vcg\n"
+"    $ graphgen --xml mycore.xml --tree --root init infile.s\n"
 "\n"
-"      Use a user-defined processor to generate a call tree from init()\n"
-"      function.\n"
+"      Use a user-defined processor to generate a call tree from\n"
+"      init() function.\n"
 "\n"
 );
 
@@ -1436,13 +1448,22 @@ int main(int argc, char **argv) {
     if (debug)
         VERBOSE = 2;
 
-    if (argc - optind != 2) {
+    if (((argc - optind) != 1) && (((argc - optind) != 2))) {
         usage();
         return 1;
     }
 
     strncpy_s(infile, argv[optind], sizeof(infile)-1);
-    strncpy_s(outfile, argv[optind+1], sizeof(outfile)-1);
+
+    if (argc - optind == 2) {
+        strncpy_s(outfile, argv[optind+1], sizeof(outfile)-1);
+    } else {
+        int i;
+        strncpy_s(outfile, argv[optind], sizeof(outfile)-1);
+        for(i=(int)strnlen(outfile,MAXSIZE)-1; i>0 && outfile[i]!='.'; i--) ;
+        if (i != 0) outfile[i] = 0;
+        strncat_s(outfile, MAXSIZE, ".vcg", MAXSIZE);
+    }
 
     if (automatic) {
         int result;

@@ -41,6 +41,7 @@ extern int   target;
 #define ITEM_CALLR _arch[target].pat[5]
 
 #define strncpy_s __strncpy_s
+#define strncat_s __strncat_s
 int xmlparse(char*);
 int parse_xml_array (char *buf, int len);
 char *strncpy_s(char *dest, const char *src, size_t n);
