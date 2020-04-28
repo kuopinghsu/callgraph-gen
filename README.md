@@ -26,7 +26,7 @@ $ sudo apt install libpcre2-dev libxml2-dev
 Checkout the repository and initialize all submodules
 
 ```text
-$ git clone https://github.com/kuopinghsu/callgraph.git
+$ git clone https://github.com/kuopinghsu/callgraph-gen.git
 $ git submodule update --init --recursive
 ```
 
