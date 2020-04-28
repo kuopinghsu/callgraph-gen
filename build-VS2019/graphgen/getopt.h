@@ -179,7 +179,7 @@ static void
 permute_args(int panonopt_start, int panonopt_end, int opt_end,
 	char * const *nargv)
 {
-	int cstart, cyclelen, i, j, ncycle, nnonopts, nopts;
+	int cyclelen, i, j, ncycle, nnonopts, nopts;
 	char *swap;
 
 	/*
@@ -192,7 +192,7 @@ permute_args(int panonopt_start, int panonopt_end, int opt_end,
 
 	for (i = 0; i < ncycle; i++) {
 		int pos;
-		cstart = panonopt_end+i;
+		int cstart = panonopt_end+i;
 		pos = cstart;
 		for (j = 0; j < cyclelen; j++) {
 			if (pos >= panonopt_end)
