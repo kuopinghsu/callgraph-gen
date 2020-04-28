@@ -75,7 +75,7 @@ parse_xml_array (char *buf, int len)
                 return -1;
             }
 
-            strncpy_s(str, (char*)value, MAXSTRLEN-1);
+            strncpy_s(str, MAXSTRLEN-1, (char*)value, MAXSTRLEN-1);
             ITEM_NAME = str;
 
             xmlFree (name);
@@ -99,7 +99,7 @@ parse_xml_array (char *buf, int len)
                         return -1;
                     }
 
-                    strncpy_s(str, (char*)value, MAXSTRLEN-1);
+                    strncpy_s(str, MAXSTRLEN-1, (char*)value, MAXSTRLEN-1);
 
                     if (!strcmp((char*)name, "func")) {
                         ITEM_FUNC = str;

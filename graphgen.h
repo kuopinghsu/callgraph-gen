@@ -6,6 +6,10 @@
 
 #define _CRT_SECURE_NO_WARNINGS 1
 
+#if defined(__MINGW__) || defined(_MSC_VER)
+#define __STDC_WANT_LIB_EXT1__ 1
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -40,11 +44,15 @@ extern int   target;
 #define ITEM_CALL  _arch[target].pat[4]
 #define ITEM_CALLR _arch[target].pat[5]
 
-#define strncpy_s __strncpy_s
-#define strncat_s __strncat_s
 int xmlparse(char*);
 int parse_xml_array (char *buf, int len);
-char *strncpy_s(char *dest, const char *src, size_t n);
+
+#ifndef __STDC_WANT_LIB_EXT1__
+#define strncpy_s __strncpy_s
+#define strncat_s __strncat_s
+char *strncpy_s(char *dest, size_t n, const char *src, size_t count);
+char *strncat_s(char *dest, size_t n, const char *src, size_t count);
+#endif
 
 #endif // __GRAPHGEN_H__
 
