@@ -27,6 +27,7 @@ Checkout the repository and initialize all submodules
 
 ```text
 $ git clone https://github.com/kuopinghsu/callgraph-gen.git
+$ cd callgraph-gen
 $ git submodule update --init --recursive
 ```
 
