@@ -41,12 +41,12 @@ build on Visual Studio 2019
 ```text
 % mkdir {somewhere} && cd {somewhere}
 % git clone https://github.com/kiyolee/libxml2-win-build.git
-% git clone https://github.com/kiyolee/pcre-win-build.git
-% git clone --recursive https://github.com/kuopinghsu/callgraph.git
+% git clone https://github.com/kiyolee/pcre2-win-build.git
+% git clone --recursive https://github.com/kuopinghsu/callgraph-gen.git
 ```
 
 Modify the file ./libxml2-win-build/include/libxml/xmlversion.h, keep
-the following and delete all other LIBXML_xxxx_ENABLED settings.
+the following and remove all other LIBXML_xxxx_ENABLED settings.
 
 ```text
 LIBXML_THREAD_ENABLED

@@ -81,22 +81,22 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>.;..\..\..\libxml2-win-build\include;..\..\..\pcre2-win-build\include;..\..\..\callgraph-gen\uthash\src;..\..\..\callgraph-gen;$(IncludePath)</IncludePath>
+    <IncludePath>.;..\..\..\libxml2-win-build\include;..\..\..\pcre2-win-build\include;$(IncludePath)</IncludePath>
     <LibraryPath>..\..\..\pcre2-win-build\build-VS2019\x64\Release;..\..\..\libxml2-win-build\build-VS2019\x64\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>.;..\..\..\libxml2-win-build\include;..\..\..\pcre2-win-build\include;..\..\..\callgraph-gen\uthash\src;..\..\..\callgraph-gen;$(IncludePath)</IncludePath>
+    <IncludePath>.;..\..\..\libxml2-win-build\include;..\..\..\pcre2-win-build\include;$(IncludePath)</IncludePath>
     <LibraryPath>..\..\..\pcre2-win-build\build-VS2019\x64\Release;..\..\..\libxml2-win-build\build-VS2019\x64\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>.;..\..\..\libxml2-win-build\include;..\..\..\pcre2-win-build\include;..\..\..\callgraph-gen\uthash\src;..\..\..\callgraph-gen;$(IncludePath)</IncludePath>
+    <IncludePath>.;..\..\..\libxml2-win-build\include;..\..\..\pcre2-win-build\include;$(IncludePath)</IncludePath>
     <LibraryPath>..\..\..\pcre2-win-build\build-VS2019\x64\Release;..\..\..\libxml2-win-build\build-VS2019\x64\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>.;..\..\..\libxml2-win-build\include;..\..\..\pcre2-win-build\include;..\..\..\callgraph-gen\uthash\src;..\..\..\callgraph-gen;$(IncludePath)</IncludePath>
+    <IncludePath>.;..\..\..\libxml2-win-build\include;..\..\..\pcre2-win-build\include;$(IncludePath)</IncludePath>
     <LibraryPath>..\..\..\pcre2-win-build\build-VS2019\x64\Release;..\..\..\libxml2-win-build\build-VS2019\x64\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

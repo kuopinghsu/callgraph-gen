@@ -10,7 +10,7 @@
 #define PCRE2_CODE_UNIT_WIDTH 8
 #include <pcre2.h>
 
-#include "uthash.h"
+#include "uthash/src/uthash.h"
 
 #define MAXSIZE             MAXSTRLEN
 #define MAXREG              64
@@ -106,7 +106,7 @@ STRING *ignore = NULL;          // ignore node
 RNODE  *rnode = NULL;           // recursive node
 
 char *strncpy_s(char *dest, const char *src, size_t n) {
-    int len = strnlen(src, n);
+    int len = (int)strnlen(src, n);
     memcpy(dest, src, len);
     dest[len] = 0;
     return dest;
@@ -160,7 +160,7 @@ void usage(void) {
 // strip space
 char * trim(char * s) {
     static char str[MAXSIZE];
-    int l = strnlen(s, MAXSIZE-1);
+    int l = (int)strnlen(s, MAXSIZE-1);
 
     while(isspace((int)s[l - 1])) --l;
     while(* s && isspace((int)* s)) { ++s, --l; }
