@@ -47,9 +47,12 @@ extern int   target;
 int xmlparse(char*);
 int parse_xml_array (char *buf, int len);
 
-#ifndef __STDC_WANT_LIB_EXT1__
-#define strncpy_s __strncpy_s
-#define strncat_s __strncat_s
+#if defined __APPLE__
+#  define strncpy_s(a,b,c,d) strlcpy(a,c,d)
+#  define strncat_s(a,b,c,d) strlcat(a,c,d)
+#elif !defined(__STDC_WANT_LIB_EXT1__)
+#  define strncpy_s __strncpy_s
+#  define strncat_s __strncat_s
 char *strncpy_s(char *dest, size_t n, const char *src, size_t count);
 char *strncat_s(char *dest, size_t n, const char *src, size_t count);
 #endif
