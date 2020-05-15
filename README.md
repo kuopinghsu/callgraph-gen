@@ -66,8 +66,8 @@ Build libxml2-static and libpcre2-8-static, and then build callgraph.
 
 ## Usage
 ```text
-Generate call graph of a elf binary file. Apr 28 2020 build
-Written by Kuoping Hsu, MIT license
+Call graph generator. May 15 2020 build, written by Kuoping Hsu, MIT license
+https://github.com/kuopinghsu/callgraph-gen
 
 Usage:
     graphgen [-v] [-a target] [-x file] [-r function_name] [-m n]
@@ -99,8 +99,8 @@ Example:
 
     $ graphgen --max 10 --tree --ignore abort,exit infile.s
 
-      maximun tree depth is 10, generate a call tree, ignode function
-      abort, and exit.
+      maximun tree depth is 10, generate a call tree, ignore functions
+      abort(), and exit().
 
     $ graphgen --xml mycore.xml --tree --root init infile.s
 

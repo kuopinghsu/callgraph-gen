@@ -22,6 +22,11 @@ char default_xml[] = {
 #include "default_xml.inc"
 };
 
+char *copyright[] = {
+    "Call graph generator. " __DATE__ " build, written by Kuoping Hsu, MIT license",
+    "https://github.com/kuopinghsu/callgraph-gen"
+};
+
 int MAXDEPTH = DEFAULT_MAXDEPTH;
 int VERBOSE = 0;
 int tree = 0;
@@ -130,8 +135,7 @@ void usage(void) {
     int i;
 
     printf(
-"Generate call graph of a elf binary file. " __DATE__ " build\n"
-"Written by Kuoping Hsu, MIT license\n\n"
+"%s\n%s\n\n"
 "Usage:\n"
 "    graphgen [-v] [-a target] [-x file] [-r function_name] [-m n]\n"
 "             [-g | -t] [-c | -d] [-r name] [-i list] [-h]\n"
@@ -149,7 +153,7 @@ void usage(void) {
 "    --dot, -d               generate dot graph\n"
 "    --ignore list, -i list  ignore list\n"
 "    --help, -h              help\n"
-"\n");
+"\n", copyright[0], copyright[1]);
 
     printf("Support target:\n");
     for(i=0; i<sizeof_arch; i++) {
@@ -160,8 +164,8 @@ void usage(void) {
 "\nExample:\n\n"
 "    $ graphgen --max 10 --tree --ignore abort,exit infile.s\n"
 "\n"
-"      maximun tree depth is 10, generate a call tree, ignode function\n"
-"      abort, and exit.\n"
+"      maximun tree depth is 10, generate a call tree, ignore functions\n"
+"      abort(), and exit().\n"
 "\n"
 "    $ graphgen --xml mycore.xml --tree --root init infile.s\n"
 "\n"
@@ -220,6 +224,8 @@ NODE *node_dup(NODE *node) {
 
     if (node) {
         memcpy(s, node, sizeof(NODE));
+        if (VERBOSE > 1)
+            printf("node %s (%s) duplicated\n", node->name, node->key);
 
         if (s->list) {
             int i;
@@ -233,6 +239,9 @@ NODE *node_dup(NODE *node) {
             memcpy(list, s->list, sizeof(LIST));
             s->list = list;
 
+            if (VERBOSE > 1)
+                printf(" + add child %s (%s)\n", list->child->name, list->child->key);
+
             p = s->list;
             l = list->next;
             for(i = 0; i<MAXCHILD && l != NULL; i++, l = l->next) {
@@ -243,6 +252,8 @@ NODE *node_dup(NODE *node) {
                 memcpy(list, l, sizeof(LIST));
                 p->next = list;
                 p = list;
+                if (VERBOSE > 1)
+                    printf(" + add child %s (%s)\n", list->child->name, list->child->key);
             }
         }
     } else {
@@ -297,6 +308,12 @@ int preparsing(char *filename) {
     if ((fp = fopen(filename, "r")) == NULL) {
         fprintf(stderr, "Can not open file %s\n", filename);
         return -1;
+    }
+
+    if (VERBOSE > 1) {
+        printf("============================================================\n"
+               "== preparsing\n"
+               "============================================================\n");
     }
 
     maxcnt = 0;
@@ -412,6 +429,13 @@ int create_graph(char *filename) {
         return 1;
     }
 
+    if (VERBOSE > 1) {
+        printf("\n"
+               "============================================================\n"
+               "== graph creating\n"
+               "============================================================\n");
+    }
+
     stack = 0;
 
     for(i=0; i<MAXREG; i++) {
@@ -485,6 +509,9 @@ int create_graph(char *filename) {
             for(i=0; i<MAXREG; i++) {
                 regmap[i][0] = 0;
             }
+
+            if (VERBOSE > 1)
+                printf("add node %s\n", node->name);
 
             continue;
         }
@@ -615,7 +642,7 @@ int create_graph(char *filename) {
                     HASH_FIND_STR(rnode, name, str);
 
                     if (!str) {
-                        fprintf(stderr, "Warning: recursive function %s dectect\n", name);
+                        printf("Warning: recursive function %s dectect\n", name);
 
                         if ((str = malloc(sizeof(RNODE))) == NULL) {
                             printf("malloc fail\n");
@@ -644,6 +671,9 @@ int create_graph(char *filename) {
 
                 // add node to hash
                 HASH_ADD_STR(graph, key, s);
+
+                if (VERBOSE > 1)
+                    printf("add node %s\n", node->name);
             }
 
             s->parent = node;
@@ -659,6 +689,9 @@ int create_graph(char *filename) {
                 list->attr = stackoff;
                 list->next = NULL;
                 list->child = s;
+
+                if (VERBOSE > 1)
+                    printf(" + add child %s\n", s->name);
             } else {
                 for(i=0; i<MAXCHILD && list->next != NULL; i++) {
                     if (!strcmp(s->name, list->child->name)) {
@@ -682,16 +715,15 @@ int create_graph(char *filename) {
                     ptr->attr = stackoff;
                     ptr->next = NULL;
                     ptr->child = s;
+
+                    if (VERBOSE > 1)
+                        printf(" + add child %s\n", s->name);
                 }
 
                 if (i == MAXCHILD) {
                     fprintf(stderr, "Error: out of range for MAXCHILD: %d\n", i);
                     exit(-1);
                 }
-            }
-
-            if (VERBOSE > 1 && !found) {
-                printf("add %s to %s\n", s->name, node->name);
             }
 
             if (!MULTILINE) continue;
@@ -740,7 +772,7 @@ int create_graph(char *filename) {
                         HASH_FIND_STR(rnode, regmap[reg], str);
 
                         if (!str) {
-                            fprintf(stderr, "Warning: recursive function %s dectect\n",
+                            printf("Warning: recursive function %s dectect\n",
                                     regmap[reg]);
 
                             if ((str = malloc(sizeof(RNODE))) == NULL) {
@@ -770,6 +802,9 @@ int create_graph(char *filename) {
 
                     // add node to hash
                     HASH_ADD_STR(graph, key, s);
+
+                    if (VERBOSE > 1)
+                        printf("add node %s\n", node->name);
                 }
 
                 s->parent = node;
@@ -785,6 +820,9 @@ int create_graph(char *filename) {
                     list->attr = stackoff;
                     list->next = NULL;
                     list->child = s;
+
+                    if (VERBOSE > 1)
+                        printf(" + add child %s\n", s->name);
                 } else {
                     for(i=0; i<MAXCHILD && list->next != NULL; i++) {
                         if (!strcmp(s->name, list->child->name)) {
@@ -808,16 +846,15 @@ int create_graph(char *filename) {
                         ptr->attr = stackoff;
                         ptr->next = NULL;
                         ptr->child = s;
+
+                        if (VERBOSE > 1)
+                            printf(" + add child %s\n", s->name);
                     }
 
                     if (i == MAXCHILD) {
                         fprintf(stderr, "Error: out of range for MAXCHILD: %d\n", i);
                         exit(-1);
                     }
-                }
-
-                if (VERBOSE > 1 && !found) {
-                    printf("add %s to %s\n", s->name, node->name);
                 }
             } else {
                 int found = 0;
@@ -834,6 +871,9 @@ int create_graph(char *filename) {
 
                     // add node to hash
                     HASH_ADD_STR(graph, key, unknown);
+
+                    if (VERBOSE > 1)
+                        printf("add node %s\n", unknown->name);
                 }
 
                 unknown->parent = node;
@@ -849,6 +889,9 @@ int create_graph(char *filename) {
                     list->attr = stackoff;
                     list->next = NULL;
                     list->child = unknown;
+
+                    if (VERBOSE > 1)
+                        printf(" + add child %s\n", unknown->name);
                 } else {
                     for(i=0; i<MAXCHILD && list->next != NULL; i++) {
                         if (!strcmp(unknown->name, list->child->name)) {
@@ -872,16 +915,15 @@ int create_graph(char *filename) {
                         ptr->attr = stackoff;
                         ptr->next = NULL;
                         ptr->child = unknown;
+
+                        if (VERBOSE > 1)
+                            printf(" + add child %s\n", unknown->name);
                     }
 
                     if (i == MAXCHILD) {
                         fprintf(stderr, "Error: out of range for MAXCHILD: %d\n", i);
                         exit(-1);
                     }
-                }
-
-                if (VERBOSE > 1 && !found) {
-                    printf("add %s to %s\n", unknown->name, node->name);
                 }
             }
 
@@ -958,7 +1000,7 @@ void traverse(NODE *node, int attr) {
         depth = maxdepth;
 
     if (VERBOSE > 1)
-        printf("%s (%d)\n", node->key, maxdepth);
+        printf("node %s at depth %d\n", node->key, maxdepth);
 
     if (!list) {
         t->tag = 0;
@@ -1010,7 +1052,9 @@ void traverse(NODE *node, int attr) {
                 node_new->traversed = 0;
                 node_new->recursived = list->child->recursived;
 
+                if (VERBOSE > 1) printf("duplicate node from %s to ", node_new->key);
                 snprintf(node_new->key, MAXSIZE, "%s:%d", node_new->name, node_new->id);
+                if (VERBOSE > 1) printf("%s\n", node_new->key);
 
                 // add node to hash
                 HASH_ADD_STR(graph, key, node_new);
@@ -1031,7 +1075,7 @@ void traverse(NODE *node, int attr) {
                     HASH_FIND_STR(rnode, list->child->name, str);
 
                     if (!str) {
-                        fprintf(stderr, "Warning: detect recursive funcion call at %s\n",
+                        printf("Warning: detect recursive funcion call at %s\n",
                                 list->child->name);
 
                         if ((str = malloc(sizeof(RNODE))) == NULL) {
@@ -1094,10 +1138,11 @@ void create_tree(char *name) {
                 t->id = r->node->id;
                 HASH_ADD_STR(tnode, name, t);
             }
+
+            if (VERBOSE > 1) printf("\n* root: %s\n", r->node->name);
             traverse(r->node, 0);
             mark_tree(mark_node);
             r->frame_size = max_frame;
-            if (VERBOSE > 1) printf("root: %s\n", r->node->name);
         }
     } else {
         NODE *s;
@@ -1175,23 +1220,25 @@ void gen_graph_vcg(char *filename, int only_linked) {
     }
 
     fprintf(fp,
-        "graph: {\n" \
-        "  x: 450\n" \
-        "  y: 30\n" \
-        "  width:  550\n" \
-        "  height: 500\n" \
-        "  color: lightcyan\n" \
-        "  stretch: 4\n" \
+        "// %s\n"
+        "// %s\n", copyright[0], copyright[1]);
+
+    // VCG header
+    fprintf(fp,
+        "graph: {\n"
+        "  x: 450\n"
+        "  y: 30\n"
+        "  width:  550\n"
+        "  height: 500\n"
+        "  color: lightcyan\n"
+        "  stretch: 4\n"
         "  shrink: 10\n\n");
 
+    // generate VCG nodes and edges
     HASH_ITER(hh, graph, s, tmp) {
         char *color;
         char stack[MAXSIZE] = "";
         char frame[MAXSIZE] = "";
-
-        if (VERBOSE > 1)
-            printf("%s: callee addr 0x%08x, prog size: %u, stack size: %u\n",
-                    s->name, s->pc, s->prog_size, s->stack_size);
 
         if (only_linked && !s->traversed)
             continue;
@@ -1204,19 +1251,19 @@ void gen_graph_vcg(char *filename, int only_linked) {
 
         if (s->unknown || (s->prog_size == 0))
             color = "lightgrey";
-        else if (s->mark)
-            color = "white";
         else if (s->recursived)
             color = "aquamarine";
+        //else if (s->mark)
+        //    color = "white";
         else
             color = "white";
 
         // Add VCG Node
-        fprintf(fp, \
-            "  node: {\n" \
-            "    title: \"%s\"\n" \
-            "    label: \"%s\\nPROG: %u%s%s\"\n" \
-            "    color: %s\n" \
+        fprintf(fp,
+            "  node: {\n"
+            "    title: \"%s\"\n"
+            "    label: \"%s\\nPROG: %u%s%s\"\n"
+            "    color: %s\n"
             "  }\n\n",
             s->key,
             s->name,
@@ -1268,6 +1315,7 @@ void gen_graph_vcg(char *filename, int only_linked) {
         if (s->recursived != 0) fprintf(fp, "\n");
     }
 
+    // VCG end
     fprintf(fp, "}\n");
     fclose(fp);
 }
@@ -1286,16 +1334,22 @@ void gen_graph_dot(char *filename, int only_linked) {
         exit(-1);
     }
 
-    fprintf(fp, "digraph callgraph {\n");
+    fprintf(fp,
+        "// %s\n"
+        "// %s\n", copyright[0], copyright[1]);
 
+    // dot header
+    fprintf(fp,
+        "digraph callgraph {\n"
+        "  graph [ rankdir = \"LR\" ];\n"
+        "  node [ fontsize = \"16\" shape = \"record\" style = \"filled\" ];\n"
+        "  edge [ color = \"black\" ];\n\n");
+
+    // genrate dot nodes and edges
     HASH_ITER(hh, graph, s, tmp) {
         char *color;
         char stack[MAXSIZE] = "";
         char frame[MAXSIZE] = "";
-
-        if (VERBOSE > 1)
-            printf("%s: callee addr 0x%08x, prog size: %u, stack size: %u\n",
-                    s->name, s->pc, s->prog_size, s->stack_size);
 
         if (only_linked && !s->traversed)
             continue;
@@ -1307,17 +1361,17 @@ void gen_graph_dot(char *filename, int only_linked) {
             snprintf(frame, sizeof(frame), "|FRAME: %u", s->frame_size);
 
         if (s->unknown || (s->prog_size == 0))
-            color = "aquamarine";
-        else if (s->mark)
-            color = "white";
+            color = "lightgray";
         else if (s->recursived)
             color = "aquamarine";
+        //else if (s->mark)
+        //    color = "white";
         else
             color = "white";
 
         // Add dot Node
         fprintf(fp,
-            "  %s_%d [ label = \"%s|PROG: %u%s%s\" color = %s];\n",
+            "  %s_%d [ label = \"%s|PROG: %u%s%s\" fillcolor = \"%s\"];\n",
             s->name, s->id,
             s->name,
             s->prog_size,
@@ -1331,14 +1385,18 @@ void gen_graph_dot(char *filename, int only_linked) {
         // Add dot edge
         list = s->list;
         for(i=0; list != NULL; i++) {
-            fprintf(fp, "  %s_%d -> %s_%d [color=\"0.650 0.700 0.700\"];\n",
-                s->name, s->id, list->child->name, list->child->id);
+            if (list->child->mark && stack_info)
+                fprintf(fp, "  %s_%d -> %s_%d [ color = \"red\" ];\n",
+                    s->name, s->id, list->child->name, list->child->id);
+            else
+                fprintf(fp, "  %s_%d -> %s_%d;\n",
+                    s->name, s->id, list->child->name, list->child->id);
             list = list->next;
             edge_count++;
         }
 
         if (s->recursived) {
-            fprintf(fp, "  %s_%d -> %s_%d [color=\"0.650 0.700 0.700\"];\n",
+            fprintf(fp, "  %s_%d -> %s_%d [ color = \"darkblue\" ];\n",
                 s->name, s->id, s->name, s->id);
             edge_count++;
         }
@@ -1346,6 +1404,7 @@ void gen_graph_dot(char *filename, int only_linked) {
         if (i != 0) fprintf(fp, "\n");
     }
 
+    // dot end
     fprintf(fp, "\n}\n");
     fclose(fp);
 }
@@ -1465,8 +1524,13 @@ int main(int argc, char **argv) {
         strncpy_s(outfile, sizeof(outfile)-1, argv[optind], sizeof(outfile)-1);
         for(i=(int)strnlen(outfile,MAXSIZE)-1; i>0 && outfile[i]!='.'; i--) ;
         if (i != 0) outfile[i] = 0;
-        strncat_s(outfile, MAXSIZE, ".vcg", MAXSIZE);
+        if (vcg)
+            strncat_s(outfile, MAXSIZE, ".vcg", MAXSIZE);
+        else
+            strncat_s(outfile, MAXSIZE, ".dot", MAXSIZE);
     }
+
+    printf("%s\n%s\n\n", copyright[0], copyright[1]);
 
     if (automatic) {
         int result;
@@ -1480,6 +1544,13 @@ int main(int argc, char **argv) {
     create_graph(infile);
 
     if (tree) {
+        if (VERBOSE > 1) {
+            printf("\n"
+                   "============================================================\n"
+                   "== tree creating\n"
+                   "============================================================\n");
+        }
+
         if (root_node[0]) {
             create_tree(root_node);
         } else {
@@ -1496,12 +1567,9 @@ int main(int argc, char **argv) {
     printf("===========\n");
     printf("Total node count: %d\n", node_count);
     printf("Total edge count: %d\n", edge_count);
-    if (recursive_count)
-        printf("Detected recursive count: %d\n", recursive_count);
-    if (indirect)
-        printf("Indirect function call: %d\n", indirect);
-    if (tree)
-        printf("The depthest node is at level %d.\n", depth);
+    if (recursive_count) printf("Detected recursive count: %d\n", recursive_count);
+    if (indirect)        printf("Indirect function call: %d\n", indirect);
+    if (tree)            printf("The depthest node is at level %d.\n", depth);
     printf("\n");
 
     return 0;
