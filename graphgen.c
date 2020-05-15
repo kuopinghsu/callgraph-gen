@@ -596,7 +596,7 @@ int create_graph(char *filename) {
 
                     // modify the function name
                     for(i=0; regmap[reg][i] != 0 && i < MAXSIZE; i++)
-                        if (regmap[reg][i] == '+' || regmap[reg][i] == '-') regmap[reg][i] = '_';
+                        if (regmap[reg][i] == '+' || regmap[reg][i] == '-' || regmap[reg][i] == '.') regmap[reg][i] = '_';
                 }
                 if (!MULTILINE) continue;
             }
@@ -611,7 +611,6 @@ int create_graph(char *filename) {
             LIST *ptr;
             LIST *list;
             int stackoff = 0;
-            int found = 0;
             char key[MAXSIZE];
 
             if (skip) continue;
@@ -628,7 +627,7 @@ int create_graph(char *filename) {
 
             // modify the function name
             for(i=0; i < MAXSIZE && name[i] != 0; i++)
-                if (name[i] == '+' || name[i] == '-') name[i] = '_';
+                if (name[i] == '+' || name[i] == '-' || name[i] == '.') name[i] = '_';
 
             // recursive checking
             if (tree && !strcmp(node->name, name)) {
@@ -693,6 +692,8 @@ int create_graph(char *filename) {
                 if (VERBOSE > 1)
                     printf(" + add child %s\n", s->name);
             } else {
+                int found = 0;
+
                 for(i=0; i<MAXCHILD && list->next != NULL; i++) {
                     if (!strcmp(s->name, list->child->name)) {
                         found = 1;
@@ -755,7 +756,6 @@ int create_graph(char *filename) {
                 NODE *s;
                 LIST *ptr;
                 LIST *list;
-                int found = 0;
                 char key[MAXSIZE];
 
                 if (VERBOSE > 1)
@@ -824,6 +824,8 @@ int create_graph(char *filename) {
                     if (VERBOSE > 1)
                         printf(" + add child %s\n", s->name);
                 } else {
+                    int found = 0;
+
                     for(i=0; i<MAXCHILD && list->next != NULL; i++) {
                         if (!strcmp(s->name, list->child->name)) {
                             found = 1;
