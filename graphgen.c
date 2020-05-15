@@ -857,7 +857,6 @@ int create_graph(char *filename) {
                     }
                 }
             } else {
-                int found = 0;
                 indirect++;
 
                 if (unknown == NULL) {
@@ -893,6 +892,8 @@ int create_graph(char *filename) {
                     if (VERBOSE > 1)
                         printf(" + add child %s\n", unknown->name);
                 } else {
+                    int found = 0;
+
                     for(i=0; i<MAXCHILD && list->next != NULL; i++) {
                         if (!strcmp(unknown->name, list->child->name)) {
                             found = 1;
