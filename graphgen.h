@@ -22,7 +22,7 @@
 typedef struct _ARCH {
     char *name;
     int   multiline;
-    char *pat[6];
+    char *pat[7];
 } ARCH;
 
 #ifdef __DEF_ARRAY__
@@ -43,6 +43,7 @@ extern int   target;
 #define ITEM_LOADR _arch[target].pat[3]
 #define ITEM_CALL  _arch[target].pat[4]
 #define ITEM_CALLR _arch[target].pat[5]
+#define ITEM_JUMP  _arch[target].pat[6]
 
 int xmlparse(char*);
 int parse_xml_array (char *buf, int len);

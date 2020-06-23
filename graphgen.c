@@ -18,6 +18,8 @@
 #define MAXLINE             4096
 #define DEFAULT_MAXDEPTH    256
 
+#define ASSERT(n)           if(!(n)) { printf("assert %s:%d\n", __FILE__, __LINE__); exit(-1); }
+
 char default_xml[] = {
 #include "default_xml.inc"
 };
@@ -184,8 +186,20 @@ char * trim(char * s) {
     while(isspace((int)s[l - 1])) --l;
     while(* s && isspace((int)* s)) { ++s, --l; }
 
-    strncpy_s(str, MAXSIZE, s, l-1);
+    strncpy_s(str, MAXSIZE, s, l);
     return str;
+}
+
+// return register number
+int getreg(const char* name) {
+    int n = 0;
+
+    if (name[0] < '0' || name[0] > '9')
+        n = -1;
+    else
+        n = atoi(name);
+
+    return n;
 }
 
 // generate ignore list to hash
@@ -207,6 +221,9 @@ void generate_ignore(void) {
 
             strncpy_s(str->name, MAXSIZE-1, func_name, MAXSIZE-1);
             HASH_ADD_STR(ignore, name, str);
+
+            if (VERBOSE > 1)
+                printf("ignore %s function\n", str->name);
         }
 
         token = strtok(NULL, ",");
@@ -390,6 +407,16 @@ int preparsing(char *filename) {
             if (ovector != NULL) {
                 matched++;
                 if (!MULTILINE) continue;
+            }
+
+            // jump
+            if (ITEM_JUMP[0] != 0) {
+                ovector = regex(re, match_data, (PCRE2_SPTR8)line, (PCRE2_SPTR8)
+                          ITEM_JUMP);
+                if (ovector != NULL) {
+                    matched++;
+                    if (!MULTILINE) continue;
+                }
             }
         }
 
@@ -586,12 +613,12 @@ int create_graph(char *filename) {
 
                 // register number
                 getop(buf, line, ovector, 2);
-                reg = atoi(buf);
+                reg = getreg(buf);
 
                 // function name
                 getop(buf, line, ovector, 3);
 
-                if (reg < MAXREG) {
+                if (reg >= 0 && reg < MAXREG) {
                     strncpy_s(regmap[reg], MAXSIZE-1, buf, MAXSIZE-1);
 
                     // modify the function name
@@ -605,6 +632,10 @@ int create_graph(char *filename) {
         // function call
         ovector = regex(re, match_data, (PCRE2_SPTR8)line, (PCRE2_SPTR8)
                   ITEM_CALL);
+        if (ovector == NULL && ITEM_JUMP[0] != 0) { // Jump call
+            ovector = regex(re, match_data, (PCRE2_SPTR8)line, (PCRE2_SPTR8)
+                      ITEM_JUMP);
+        }
         if (ovector != NULL) {
             int i;
             NODE *s;
@@ -750,9 +781,9 @@ int create_graph(char *filename) {
             }
 
             getop(buf, line, ovector, 3);
-            reg = atoi(buf);
+            reg = getreg(buf);
 
-            if (regmap[reg][0]) {
+            if (reg >= 0 && regmap[reg][0]) {
                 NODE *s;
                 LIST *ptr;
                 LIST *list;
@@ -1443,7 +1474,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    if (argc <= 2) {
+    if (argc <= 1) {
         usage();
         return 1;
     }

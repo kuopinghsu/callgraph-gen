@@ -113,6 +113,8 @@ parse_xml_array (char *buf, int len)
                         ITEM_CALL = str;
                     } else if (!strcmp((char*)name, "callx")) {
                         ITEM_CALLR = str;
+                    } else if (!strcmp((char*)name, "jump")) {
+                        ITEM_JUMP = str;
                     } else if (!strcmp((char*)name, "multiline")) {
                         MULTILINE = atoi((char*) str);
                         free(str);

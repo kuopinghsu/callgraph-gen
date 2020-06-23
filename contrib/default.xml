@@ -11,6 +11,7 @@
             <detail name="loader"/>
             <detail name="call"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+(jal)\s+\S+,[0-9A-Fa-f]+\s+<(.+)>]]></detail>
             <detail name="callx"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+(jalr)\s+(\S+)]]></detail>
+            <detail name="jump"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+(j)\s+[0-9A-Fa-f]+\s+<([^\+^\-]+)>]]></detail>
             <detail name="multiline">0</detail>
         </details>
 
@@ -22,6 +23,7 @@
             <detail name="loader"/>
             <detail name="call"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+(bl)\s+[0-9A-Fa-f]+\s+<(.+)>]]></detail>
             <detail name="callx"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+(blx)\s+(\S+)]]></detail>
+            <detail name="jump"/>
             <detail name="multiline">0</detail>
         </details>
 
@@ -32,7 +34,8 @@
             <detail name="push"/>
             <detail name="loader"/>
             <detail name="call"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+(l\.jal)\s+[0-9A-Fa-f]+\s+<(.+)>]]></detail>
-            <detail name="callx"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+(l\.jalr)\s+(\S+)]]></detail>
+            <detail name="callx"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+(l\.jalr)\s+r(\d+)]]></detail>
+            <detail name="jump"/>
             <detail name="multiline">0</detail>
 	</details>
 
@@ -44,6 +47,7 @@
             <detail name="loader"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+l32r\s+a(\d+).+<(.+)>]]></detail>
             <detail name="call"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+(call[048])\s+[0-9A-Fa-f]+\s+<(.+)>]]></detail>
             <detail name="callx"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+(callx[048])\s+a(\d+)]]></detail>
+            <detail name="jump"/>
             <detail name="multiline">1</detail>
         </details>
 
@@ -55,6 +59,7 @@
             <detail name="loader"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+l32r\s+a(\d+).+<(.+)>]]></detail>
             <detail name="call"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+(call[048])\s+[0-9A-Fa-f]+\s+<(.+)>]]></detail>
             <detail name="callx"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+(callx[048])\s+a(\d+)]]></detail>
+            <detail name="jump"/>
             <detail name="multiline">1</detail>
         </details>
     </content>
