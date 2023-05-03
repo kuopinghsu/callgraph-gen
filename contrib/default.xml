@@ -9,7 +9,7 @@
             <detail name="stack"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+addi\s+sp,sp,\-(\d+)]]></detail>
             <detail name="push"/>
             <detail name="loader"/>
-            <detail name="call"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+(jal)\s+\S+,[0-9A-Fa-f]+\s+<(.+)>]]></detail>
+            <detail name="call"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+(jal)\s+.+<(.+)>]]></detail>
             <detail name="callx"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+(jalr)\s+(\S+)]]></detail>
             <detail name="jump"><![CDATA[^\s*([0-9A-Fa-f]+):.+\s+(j)\s+[0-9A-Fa-f]+\s+<([^\+^\-]+)>]]></detail>
             <detail name="multiline">0</detail>
